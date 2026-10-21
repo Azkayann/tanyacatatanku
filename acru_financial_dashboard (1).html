@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACRU - Financial Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        canvas: '#F2F3F5',
+                        limeBrand: '#8CE533',
+                        limeSoft: '#9BE844',
+                        yellowBrand: '#EBF73F',
+                        orangeBrand: '#FDBA63',
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px -2px rgba(0, 0, 0, 0.02), 0 1px 3px -1px rgba(0, 0, 0, 0.02)',
+                        'float': '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FFFFFF;
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        }
+
+        /* Custom Hatched / Striped Diagonal Fills */
+        .stripe-green {
+            background-color: #8FD93B;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.25),
+                rgba(255, 255, 255, 0.25) 3px,
+                transparent 3px,
+                transparent 6px
+            );
+        }
+
+        .stripe-green-light {
+            background-color: #B9EE7B;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.35),
+                rgba(255, 255, 255, 0.35) 3px,
+                transparent 3px,
+                transparent 6px
+            );
+        }
+
+        .stripe-yellow {
+            background-color: #E2F542;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.35),
+                rgba(255, 255, 255, 0.35) 3px,
+                transparent 3px,
+                transparent 6px
+            );
+        }
+
+        .stripe-orange {
+            background-color: #FDB65E;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.28),
+                rgba(255, 255, 255, 0.28) 3px,
+                transparent 3px,
+                transparent 6px
+            );
+        }
+
+        .stripe-orange-light {
+            background-color: #FED08E;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.35),
+                rgba(255, 255, 255, 0.35) 3px,
+                transparent 3px,
+                transparent 6px
+            );
+        }
+
+        /* Inactive Gray Bar Pill Styling */
+        .gray-bar-body {
+            background: linear-gradient(180deg, #ECEEF1 0%, #F4F5F7 100%);
+        }
+        .gray-bar-cap {
+            background-color: #F0F2F5;
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Tree Line for Sidebar Submenu */
+        .tree-line {
+            position: relative;
+        }
+        .tree-line::before {
+            content: '';
+            position: absolute;
+            left: 18px;
+            top: 0;
+            bottom: 14px;
+            width: 1.5px;
+            background-color: #E5E7EB;
+        }
+        .tree-item {
+            position: relative;
+        }
+        .tree-item::before {
+            content: '';
+            position: absolute;
+            left: -14px;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            border-left: 1.5px solid #E5E7EB;
+            border-bottom: 1.5px solid #E5E7EB;
+            border-bottom-left-radius: 6px;
+            transform: translateY(-65%);
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-gray-900 flex flex-col lg:flex-row min-h-screen lg:h-screen w-full lg:overflow-hidden select-none bg-white">
+
+    <!-- ================= MOBILE SIDEBAR BACKDROP OVERLAY ================= -->
+    <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 hidden lg:hidden transition-opacity opacity-0"></div>
+
+    <!-- ================= LEFT SIDEBAR (OFF-CANVAS ON MOBILE, FIXED ON DESKTOP) ================= -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-[250px] lg:w-[230px] bg-white flex flex-col justify-between h-full py-5 px-4 flex-shrink-0 transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 shadow-2xl lg:shadow-none overflow-y-auto no-scrollbar">
+        <div class="space-y-6">
+            <!-- Brand Logo & Mobile Close Button -->
+            <div class="px-2 flex items-center justify-between">
+                <span class="font-display font-extrabold text-[21px] tracking-tight text-gray-900 flex items-center">
+                    ACR<span class="inline-block relative">U<span class="absolute top-[3px] left-[4px] w-[5px] h-[9px] bg-gray-900"></span></span>
+                </span>
+                <button onclick="toggleMobileSidebar()" class="lg:hidden w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors">
+                    <i class="ph ph-x text-base"></i>
+                </button>
+            </div>
+
+            <!-- Main Navigation -->
+            <nav class="space-y-1">
+                <!-- Active Dashboard Item -->
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-[#F2F3F5] text-gray-900 rounded-xl font-medium text-[13px] relative group">
+                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-[3.5px] h-5 bg-gray-900 rounded-r-full"></div>
+                    <i class="ph ph-squares-four text-[18px] text-gray-900"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <!-- Accounts -->
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium text-[13px] transition-colors">
+                    <i class="ph ph-user text-[18px]"></i>
+                    <span>Accounts</span>
+                </a>
+
+                <!-- Transactions (Accordion Open) -->
+                <div>
+                    <button onclick="toggleSubmenu()" class="w-full flex items-center justify-between px-3 py-2.5 text-gray-800 hover:bg-gray-50 rounded-xl font-medium text-[13px] transition-colors">
+                        <div class="flex items-center gap-3">
+                            <i class="ph ph-arrows-left-right text-[18px]"></i>
+                            <span>Transactions</span>
+                        </div>
+                        <i id="tx-chevron" class="ph ph-caret-down text-xs text-gray-500 transition-transform duration-200"></i>
+                    </button>
+
+                    <!-- Submenu with Tree Connector -->
+                    <div id="tx-submenu" class="tree-line pl-8 pr-2 pt-1 space-y-1">
+                        <a href="#" class="tree-item flex items-center justify-between py-1.5 px-2 text-[12px] font-medium text-gray-900 rounded-lg hover:bg-gray-50">
+                            <span>History</span>
+                            <span class="bg-gray-900 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none">19</span>
+                        </a>
+                        <a href="#" class="tree-item block py-1.5 px-2 text-[12px] font-normal text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-50">
+                            Integration
+                        </a>
+                        <a href="#" class="tree-item block py-1.5 px-2 text-[12px] font-normal text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-50">
+                            Reports
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cash flow -->
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium text-[13px] transition-colors">
+                    <i class="ph ph-wallet text-[18px]"></i>
+                    <span>Cash flow</span>
+                </a>
+
+                <!-- Budget -->
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium text-[13px] transition-colors">
+                    <i class="ph ph-piggy-bank text-[18px]"></i>
+                    <span>Budget</span>
+                </a>
+
+                <!-- Investments -->
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium text-[13px] transition-colors">
+                    <i class="ph ph-briefcase text-[18px]"></i>
+                    <span>Investments</span>
+                </a>
+            </nav>
+
+            <!-- Secondary Links -->
+            <div class="pt-4 space-y-1">
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium text-[13px] transition-colors">
+                    <i class="ph ph-book-open text-[18px]"></i>
+                    <span>Learning center</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium text-[13px] transition-colors">
+                    <i class="ph ph-headset text-[18px]"></i>
+                    <span>Support</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Bottom Promo & Collapse -->
+        <div class="space-y-4 mt-6">
+            <!-- Upgrade to Pro Card -->
+            <div id="promo-card" class="bg-[#F6F7F9] p-4 rounded-2xl relative border border-gray-100/80">
+                <button onclick="document.getElementById('promo-card').style.display='none'" class="absolute top-3 right-3 w-5 h-5 bg-white rounded-md flex items-center justify-center text-gray-400 hover:text-gray-700 shadow-sm">
+                    <i class="ph ph-x text-[11px]"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center mb-3">
+                    <i class="ph-fill ph-lightning text-sm"></i>
+                </div>
+                <h4 class="font-display font-bold text-[13px] text-gray-900 mb-1">Upgrade to Pro!</h4>
+                <p class="text-[11px] text-gray-500 leading-relaxed mb-3.5">
+                    Full financial insights with analytics and graphs.
+                </p>
+                <button class="w-full bg-gray-900 hover:bg-black text-white font-medium text-[11.5px] py-2.5 rounded-xl transition-colors shadow-sm">
+                    Upgrade now
+                </button>
+            </div>
+
+            <!-- Collapse Sidebar Button -->
+            <button onclick="toggleMobileSidebar()" class="flex items-center gap-2 px-3 py-1 text-gray-600 hover:text-gray-900 text-[12.5px] font-medium transition-colors">
+                <i class="ph ph-caret-double-left text-xs"></i>
+                <span>Collapse sidebar</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ================= MAIN WORKSPACE CONTAINER ================= -->
+    <div class="flex-1 p-2 sm:p-2.5 h-full lg:overflow-hidden bg-white">
+        <main class="w-full h-full bg-canvas rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex flex-col gap-4 lg:overflow-y-auto no-scrollbar">
+
+            <!-- TOP HEADER BAR -->
+            <header class="flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
+                <!-- Left: Hamburger (Mobile) + Search Input -->
+                <div class="flex items-center gap-2.5 flex-1 sm:flex-initial">
+                    <!-- Mobile Menu Trigger -->
+                    <button onclick="toggleMobileSidebar()" class="lg:hidden w-9 h-9 bg-white rounded-xl flex items-center justify-center text-gray-800 hover:bg-gray-50 shadow-card transition-colors flex-shrink-0">
+                        <i class="ph ph-list text-[19px]"></i>
+                    </button>
+
+                    <!-- Search Input -->
+                    <div class="relative flex-1 sm:w-[260px] md:w-[330px]">
+                        <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-[15px]"></i>
+                        <input type="text" placeholder="Quick search" class="w-full bg-white pl-9 pr-4 py-2.5 rounded-xl text-[12.5px] text-gray-800 placeholder-gray-400 focus:outline-none shadow-card">
+                    </div>
+                </div>
+
+                <!-- Right Header Actions -->
+                <div class="flex items-center gap-2 sm:gap-2.5">
+                    <button class="w-9 h-9 bg-white rounded-xl flex items-center justify-center text-gray-700 hover:bg-gray-50 shadow-card transition-colors flex-shrink-0">
+                        <i class="ph ph-bell text-[17px]"></i>
+                    </button>
+                    <button class="w-9 h-9 bg-white rounded-xl flex items-center justify-center text-gray-700 hover:bg-gray-50 shadow-card transition-colors flex-shrink-0">
+                        <i class="ph ph-gear text-[17px]"></i>
+                    </button>
+
+                    <!-- User Profile Pill -->
+                    <div class="bg-white p-1 sm:pl-1.5 sm:pr-3.5 sm:py-1 rounded-xl flex items-center gap-2.5 shadow-card cursor-pointer hover:bg-gray-50 transition-colors">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Michael Johnson" class="w-7 h-7 rounded-full object-cover flex-shrink-0">
+                        <div class="leading-tight hidden md:block">
+                            <p class="text-[11.5px] font-semibold text-gray-900">Michael Johnson</p>
+                            <p class="text-[10px] text-gray-400">m.johnson@finex.com</p>
+                        </div>
+                    </div>
+
+                    <!-- Add Widget Button -->
+                    <button class="bg-white hover:bg-gray-50 text-gray-900 font-medium text-[12px] px-3 sm:px-3.5 py-2.5 rounded-xl flex items-center gap-2 shadow-card transition-colors flex-shrink-0">
+                        <i class="ph ph-plus-square text-[16px]"></i>
+                        <span class="hidden sm:inline">Add widget</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- MAIN BENTO GRID (12 COLUMNS) -->
+            <div class="grid grid-cols-12 gap-4 flex-1 min-h-0">
+
+                <!-- ================= LEFT / CENTER AREA (9 COLS ON XL) ================= -->
+                <div class="col-span-12 xl:col-span-9 flex flex-col gap-4">
+
+                    <!-- ROW 1: BALANCE OVERVIEW + TOTAL SUMMARY METRICS -->
+                    <div class="bg-white rounded-[22px] p-3.5 sm:p-4 shadow-card grid grid-cols-12 gap-4 items-stretch">
+                        
+                        <!-- Left Nested Card: Balance Overview Chart (9 Cols on LG) -->
+                        <div class="col-span-12 lg:col-span-9 bg-white rounded-2xl p-3 border border-gray-100/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] flex flex-col justify-between">
+                            <!-- Top Row of Chart -->
+                            <div class="flex flex-wrap items-start justify-between gap-2">
+                                <div>
+                                    <h2 class="font-display font-bold text-[24px] sm:text-[28px] tracking-tight text-gray-900 leading-none mb-1">$12,450</h2>
+                                    <p class="text-[11px] text-gray-400 font-medium">Balance overview</p>
+                                </div>
+
+                                <!-- Controls & Legend -->
+                                <div class="flex flex-col items-end gap-2 sm:gap-2.5 ml-auto">
+                                    <div class="flex items-center gap-1.5">
+                                        <button class="flex items-center gap-1.5 px-2.5 py-1 bg-[#F7F8FA] hover:bg-gray-100 rounded-lg text-[11px] font-medium text-gray-700 border border-gray-200/60">
+                                            <span>7d</span>
+                                            <i class="ph ph-caret-down text-[10px]"></i>
+                                        </button>
+                                        <button class="w-7 h-6 bg-[#F2F3F5] text-gray-900 rounded-lg flex items-center justify-center border border-gray-200/60">
+                                            <i class="ph-fill ph-chart-bar text-xs"></i>
+                                        </button>
+                                        <button class="w-7 h-6 bg-white text-gray-400 hover:text-gray-700 rounded-lg flex items-center justify-center border border-gray-100">
+                                            <i class="ph ph-chart-line text-xs"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Legend -->
+                                    <div class="flex flex-wrap items-center justify-end gap-2.5 sm:gap-3 text-[10px] sm:text-[10.5px] text-gray-500 font-medium">
+                                        <span class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-[2px] bg-[#E2F542]"></span> Savings
+                                        </span>
+                                        <span class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-[2px] bg-[#8FD93B]"></span> Income
+                                        </span>
+                                        <span class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-[2px] bg-[#FDB65E]"></span> Expenses
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Custom Bar Chart Area -->
+                            <div class="relative mt-4 pt-2 pb-1 flex-1 flex flex-col justify-between min-h-[195px]">
+                                <!-- Horizontal Grid Lines & Y-Axis Labels -->
+                                <div class="absolute inset-0 flex flex-col justify-between pointer-events-none pr-1 sm:pr-2 pb-5">
+                                    <div class="flex items-center gap-2 sm:gap-3 w-full">
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-400 w-4 sm:w-5 text-right">30</span>
+                                        <div class="flex-1 border-b border-gray-100"></div>
+                                    </div>
+                                    <div class="flex items-center gap-2 sm:gap-3 w-full">
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-400 w-4 sm:w-5 text-right">20</span>
+                                        <div class="flex-1 border-b border-gray-100"></div>
+                                    </div>
+                                    <div class="flex items-center gap-2 sm:gap-3 w-full">
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-400 w-4 sm:w-5 text-right">10</span>
+                                        <div class="flex-1 border-b border-gray-100"></div>
+                                    </div>
+                                    <div class="flex items-center gap-2 sm:gap-3 w-full">
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-400 w-4 sm:w-5 text-right">0</span>
+                                        <div class="flex-1 border-b border-gray-200/80"></div>
+                                    </div>
+                                    <div class="flex items-center gap-2 sm:gap-3 w-full">
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-400 w-4 sm:w-5 text-right">-10</span>
+                                        <div class="flex-1 border-b border-gray-100"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Bars Container -->
+                                <div class="relative z-10 pl-6 sm:pl-8 pr-1 sm:pr-2 flex items-end justify-between h-full pt-2 gap-1">
+                                    
+                                    <!-- SUN -->
+                                    <div class="flex flex-col items-center w-8 sm:w-11 group cursor-pointer">
+                                        <div class="w-full flex flex-col items-center justify-end h-[125px]">
+                                            <div class="w-6 sm:w-9 h-1.5 rounded-full gray-bar-cap mb-[2px]"></div>
+                                            <div class="w-7 sm:w-10 h-[52px] rounded-lg gray-bar-body"></div>
+                                        </div>
+                                        <!-- Negative part -->
+                                        <div class="w-full h-[36px] flex flex-col items-center pt-1">
+                                            <div class="w-7 sm:w-10 h-[14px] rounded-md gray-bar-body opacity-75"></div>
+                                        </div>
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-400 mt-1">Sun</span>
+                                    </div>
+
+                                    <!-- MON -->
+                                    <div class="flex flex-col items-center w-8 sm:w-11 group cursor-pointer">
+                                        <div class="w-full flex flex-col items-center justify-end h-[125px]">
+                                            <div class="w-6 sm:w-9 h-1.5 rounded-full gray-bar-cap mb-[2px]"></div>
+                                            <div class="w-7 sm:w-10 h-[44px] rounded-lg gray-bar-body"></div>
+                                        </div>
+                                        <div class="w-full h-[36px] flex flex-col items-center pt-1">
+                                            <div class="w-7 sm:w-10 h-[10px] rounded-md gray-bar-body opacity-75"></div>
+                                        </div>
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-400 mt-1">Mon</span>
+                                    </div>
+
+                                    <!-- TUE -->
+                                    <div class="flex flex-col items-center w-8 sm:w-11 group cursor-pointer">
+                                        <div class="w-full flex flex-col items-center justify-end h-[125px]">
+                                            <div class="w-6 sm:w-9 h-1.5 rounded-full gray-bar-cap mb-[2px]"></div>
+                                            <div class="w-7 sm:w-10 h-[66px] rounded-lg gray-bar-body"></div>
+                                        </div>
+                                        <div class="w-full h-[36px] flex flex-col items-center pt-1">
+                                            <div class="w-7 sm:w-10 h-[14px] rounded-md gray-bar-body opacity-75"></div>
+                                        </div>
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-400 mt-1">Tue</span>
+                                    </div>
+
+                                    <!-- WED (ACTIVE HIGHLIGHTED BAR + FLOATING TOOLTIP) -->
+                                    <div class="flex flex-col items-center w-8 sm:w-11 relative cursor-pointer">
+                                        <!-- Positive Stack (Savings + Income) -->
+                                        <div class="w-full flex flex-col items-center justify-end h-[125px] gap-[2px]">
+                                            <div class="w-7 sm:w-10 h-[24px] rounded-t-lg rounded-b-sm stripe-yellow shadow-sm"></div>
+                                            <div class="w-7 sm:w-10 h-[64px] rounded-b-lg rounded-t-sm stripe-green shadow-sm"></div>
+                                        </div>
+                                        <!-- Negative Stack (Expenses) -->
+                                        <div class="w-full h-[36px] flex flex-col items-center pt-1">
+                                            <div class="w-7 sm:w-10 h-[22px] rounded-lg stripe-orange shadow-sm"></div>
+                                        </div>
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-900 font-semibold mt-1">Wed</span>
+
+                                        <!-- Floating Tooltip (Centered on very small screens, Right-aligned on SM+) -->
+                                        <div class="absolute left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-[46px] top-[6px] sm:top-[18px] z-30 bg-white/95 backdrop-blur-sm rounded-xl p-2 sm:p-2.5 shadow-float border border-gray-100 w-[124px] sm:w-[132px] pointer-events-none">
+                                            <p class="text-[9px] sm:text-[9.5px] text-gray-400 font-medium mb-1.5">Wednesday, 7 Jan 2025</p>
+                                            <div class="space-y-1 text-[10px] sm:text-[10.5px]">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="flex items-center gap-1 text-gray-600">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-[#E2F542]"></span>Savings
+                                                    </span>
+                                                    <span class="font-semibold text-gray-900">$240</span>
+                                                </div>
+                                                <div class="flex items-center justify-between">
+                                                    <span class="flex items-center gap-1 text-gray-600">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-[#8FD93B]"></span>Income
+                                                    </span>
+                                                    <span class="font-semibold text-gray-900">$700</span>
+                                                </div>
+                                                <div class="flex items-center justify-between">
+                                                    <span class="flex items-center gap-1 text-gray-600">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-[#FDB65E]"></span>Expenses
+                                                    </span>
+                                                    <span class="font-semibold text-gray-900">$460</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- THU -->
+                                    <div class="flex flex-col items-center w-8 sm:w-11 group cursor-pointer">
+                                        <div class="w-full flex flex-col items-center justify-end h-[125px]">
+                                            <div class="w-6 sm:w-9 h-1.5 rounded-full gray-bar-cap mb-[2px]"></div>
+                                            <div class="w-7 sm:w-10 h-[62px] rounded-lg gray-bar-body"></div>
+                                        </div>
+                                        <div class="w-full h-[36px] flex flex-col items-center pt-1">
+                                            <div class="w-7 sm:w-10 h-[26px] rounded-md gray-bar-body opacity-75"></div>
+                                        </div>
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-400 mt-1">Thu</span>
+                                    </div>
+
+                                    <!-- FRI -->
+                                    <div class="flex flex-col items-center w-8 sm:w-11 group cursor-pointer">
+                                        <div class="w-full flex flex-col items-center justify-end h-[125px]">
+                                            <div class="w-6 sm:w-9 h-1.5 rounded-full gray-bar-cap mb-[2px]"></div>
+                                            <div class="w-7 sm:w-10 h-[86px] rounded-lg gray-bar-body"></div>
+                                        </div>
+                                        <div class="w-full h-[36px] flex flex-col items-center pt-1">
+                                            <div class="w-7 sm:w-10 h-[20px] rounded-md gray-bar-body opacity-75"></div>
+                                        </div>
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-400 mt-1">Fri</span>
+                                    </div>
+
+                                    <!-- SAT -->
+                                    <div class="flex flex-col items-center w-8 sm:w-11 group cursor-pointer">
+                                        <div class="w-full flex flex-col items-center justify-end h-[125px]">
+                                            <div class="w-6 sm:w-9 h-1.5 rounded-full gray-bar-cap mb-[2px]"></div>
+                                            <div class="w-7 sm:w-10 h-[98px] rounded-lg gray-bar-body"></div>
+                                        </div>
+                                        <div class="w-full h-[36px] flex flex-col items-center pt-1">
+                                            <div class="w-7 sm:w-10 h-[22px] rounded-md gray-bar-body opacity-75"></div>
+                                        </div>
+                                        <span class="text-[9.5px] sm:text-[10px] text-gray-400 mt-1">Sat</span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right KPI Summary Column (3-Col Grid on Mobile/Tablet, Vertical Stack on LG+) -->
+                        <div class="col-span-12 lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 lg:flex lg:flex-col justify-between gap-4 lg:gap-0 py-1 lg:py-2 px-1 sm:px-2">
+                            <!-- Total Income -->
+                            <div class="bg-[#F9FAFB] lg:bg-transparent p-3 lg:p-0 rounded-xl">
+                                <p class="text-[11px] text-gray-500 font-medium mb-1">Total income</p>
+                                <h3 class="font-display font-bold text-[22px] sm:text-[25px] text-gray-900 tracking-tight leading-tight">$15,000</h3>
+                                <p class="text-[10.5px] text-gray-400 mt-0.5 flex items-center gap-1">
+                                    <span class="text-[#65A30D] font-semibold flex items-center"><i class="ph-bold ph-trend-up mr-0.5"></i> 5.1%</span> from last month
+                                </p>
+                            </div>
+
+                            <!-- Total Expenses -->
+                            <div class="bg-[#F9FAFB] lg:bg-transparent p-3 lg:p-0 rounded-xl">
+                                <p class="text-[11px] text-gray-500 font-medium mb-1">Total expenses</p>
+                                <h3 class="font-display font-bold text-[22px] sm:text-[25px] text-gray-900 tracking-tight leading-tight">$6,700</h3>
+                                <p class="text-[10.5px] text-gray-400 mt-0.5 flex items-center gap-1">
+                                    <span class="text-[#F59E0B] font-semibold flex items-center"><i class="ph-bold ph-trend-up mr-0.5"></i> 15.5%</span> from last month
+                                </p>
+                            </div>
+
+                            <!-- Saved Balance -->
+                            <div class="bg-[#F9FAFB] lg:bg-transparent p-3 lg:p-0 rounded-xl">
+                                <p class="text-[11px] text-gray-500 font-medium mb-1">Saved balance</p>
+                                <h3 class="font-display font-bold text-[22px] sm:text-[25px] text-gray-900 tracking-tight leading-tight">$8,300</h3>
+                                <p class="text-[10.5px] text-gray-400 mt-0.5 flex items-center gap-1">
+                                    <span class="text-[#65A30D] font-semibold flex items-center"><i class="ph-bold ph-trend-up mr-0.5"></i> 20.7%</span> from last month
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ROW 2: MONTHLY SPENDING LIMIT & BUDGET TIPS (2 EQUAL CARDS) -->
+                    <div class="grid grid-cols-12 gap-4">
+                        
+                        <!-- Card: Monthly Spending Limit -->
+                        <div class="col-span-12 md:col-span-6 bg-white rounded-[22px] p-4 shadow-card flex flex-col justify-between">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h3 class="font-display font-bold text-[14.5px] text-gray-900">Monthly spending limit</h3>
+                                    <p class="text-[11px] text-gray-400">Recipient accounts</p>
+                                </div>
+                                <button class="text-gray-500 hover:text-gray-900 transition-colors">
+                                    <i class="ph ph-pencil-simple text-[16px]"></i>
+                                </button>
+                            </div>
+
+                            <div>
+                                <!-- Striped Progress Bar -->
+                                <div class="w-full h-5 bg-[#F2F3F5] rounded-md overflow-hidden flex p-0.5 mb-2">
+                                    <div class="w-[78%] h-full stripe-green rounded-[4px]"></div>
+                                </div>
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="font-semibold text-gray-800">$8,600</span>
+                                    <span class="text-gray-400 font-medium">$10,000</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card: Optimize your budget with these quick tips -->
+                        <div class="col-span-12 md:col-span-6 bg-white rounded-[22px] p-4 shadow-card relative overflow-hidden flex flex-col justify-between">
+                            <div class="max-w-[78%] z-10">
+                                <h3 class="font-display font-bold text-[14.5px] text-gray-900 mb-1">Optimize your budget with these quick tips</h3>
+                                <p class="text-[11px] text-gray-500 leading-relaxed mb-3">
+                                    Start preparing for the 2025 tax season by saving 10-15% for deductions.
+                                </p>
+                                <a href="#" class="inline-flex items-center gap-1 text-[11.5px] font-semibold text-gray-900 hover:underline">
+                                    <span>Read more</span>
+                                    <i class="ph-bold ph-caret-right text-[10px]"></i>
+                                </a>
+                            </div>
+
+                            <!-- Decorative Geometric Blocks Bottom Right -->
+                            <div class="absolute right-3 bottom-3 flex items-end gap-1 pointer-events-none">
+                                <!-- Col 1 -->
+                                <div class="flex flex-col gap-1">
+                                    <div class="w-5 h-3.5 rounded-[3px] stripe-green-light opacity-80"></div>
+                                    <div class="w-5 h-3.5 rounded-[3px] stripe-green-light"></div>
+                                </div>
+                                <!-- Col 2 -->
+                                <div class="flex flex-col gap-1">
+                                    <div class="w-5 h-3.5 rounded-[3px] stripe-green-light"></div>
+                                    <div class="w-5 h-3.5 rounded-[3px] stripe-orange-light"></div>
+                                    <div class="w-5 h-5 rounded-[3px] stripe-green-light"></div>
+                                </div>
+                                <!-- Col 3 -->
+                                <div class="flex flex-col gap-1">
+                                    <div class="w-5 h-6 rounded-[3px] stripe-orange-light"></div>
+                                    <div class="w-5 h-10 rounded-[3px] stripe-green-light"></div>
+                                    <div class="w-5 h-5 rounded-[3px] stripe-green-light"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ROW 3: COST ANALYSIS, FINANCIAL HEALTH, GOAL TRACKER (3 EQUAL CARDS) -->
+                    <div class="grid grid-cols-12 gap-4 flex-1">
+
+                        <!-- Card 1: Cost Analysis -->
+                        <div class="col-span-12 md:col-span-6 lg:col-span-4 bg-white rounded-[22px] p-4 shadow-card flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <h3 class="font-display font-bold text-[14.5px] text-gray-900">Cost analysis</h3>
+                                        <p class="text-[11px] text-gray-400">Spending overview</p>
+                                    </div>
+                                    <button class="flex items-center gap-1.5 px-2.5 py-1 bg-[#F7F8FA] rounded-lg text-[11px] font-medium text-gray-700 border border-gray-200/60">
+                                        <span>January</span>
+                                        <i class="ph ph-caret-down text-[10px]"></i>
+                                    </button>
+                                </div>
+
+                                <h2 class="font-display font-bold text-[24px] text-gray-900 tracking-tight mb-2.5">$8,450</h2>
+
+                                <!-- Segmented Multi-Color Bar -->
+                                <div class="flex items-center gap-1 h-5 w-full mb-4">
+                                    <div class="h-full w-[18%] rounded-[4px] stripe-orange"></div>
+                                    <div class="h-full w-[8%] rounded-[4px] stripe-orange-light"></div>
+                                    <div class="h-full w-[7%] rounded-[4px] bg-[#FDE047]"></div>
+                                    <div class="h-full w-[9%] rounded-[4px] stripe-yellow"></div>
+                                    <div class="h-full w-[11%] rounded-[4px] stripe-green-light"></div>
+                                    <div class="h-full w-[17%] rounded-[4px] stripe-green"></div>
+                                    <div class="h-full flex-1 rounded-[4px] bg-[#F2F3F5]"></div>
+                                </div>
+                            </div>
+
+                            <!-- Breakdown List -->
+                            <div class="space-y-1.5 text-[11.5px]">
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2 text-gray-600">
+                                        <span class="w-2 h-2 rounded-[2px] bg-[#FDB65E]"></span> Housing
+                                    </span>
+                                    <span class="font-semibold text-gray-800">18%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2 text-gray-600">
+                                        <span class="w-2 h-2 rounded-[2px] bg-[#FED08E]"></span> Debt payments
+                                    </span>
+                                    <span class="font-semibold text-gray-800">7%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2 text-gray-600">
+                                        <span class="w-2 h-2 rounded-[2px] bg-[#FDE047]"></span> Food
+                                    </span>
+                                    <span class="font-semibold text-gray-800">6%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2 text-gray-600">
+                                        <span class="w-2 h-2 rounded-[2px] bg-[#E2F542]"></span> Transportation
+                                    </span>
+                                    <span class="font-semibold text-gray-800">9%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2 text-gray-600">
+                                        <span class="w-2 h-2 rounded-[2px] bg-[#B9EE7B]"></span> Healthcare
+                                    </span>
+                                    <span class="font-semibold text-gray-800">10%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2 text-gray-600">
+                                        <span class="w-2 h-2 rounded-[2px] bg-[#8FD93B]"></span> Investments
+                                    </span>
+                                    <span class="font-semibold text-gray-800">17%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2 text-gray-600">
+                                        <span class="w-2 h-2 rounded-[2px] bg-[#E5E7EB]"></span> Other
+                                    </span>
+                                    <span class="font-semibold text-gray-800">33%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Financial Health -->
+                        <div class="col-span-12 md:col-span-6 lg:col-span-4 bg-white rounded-[22px] p-4 shadow-card flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <h3 class="font-display font-bold text-[14.5px] text-gray-900">Financial health</h3>
+                                        <p class="text-[11px] text-gray-400">Current status</p>
+                                    </div>
+                                    <button class="flex items-center gap-1.5 px-2.5 py-1 bg-[#F7F8FA] rounded-lg text-[11px] font-medium text-gray-700 border border-gray-200/60">
+                                        <span>30d</span>
+                                        <i class="ph ph-caret-down text-[10px]"></i>
+                                    </button>
+                                </div>
+
+                                <h2 class="font-display font-bold text-[24px] text-gray-900 tracking-tight leading-tight">$15,780</h2>
+                                <p class="text-[10.5px] text-gray-400 mt-0.5 flex items-center gap-1">
+                                    <span class="text-[#65A30D] font-semibold flex items-center"><i class="ph-bold ph-trend-up mr-0.5"></i> 17.5%</span> from last month
+                                </p>
+                            </div>
+
+                            <!-- Semi-Circle Segmented Gauge SVG -->
+                            <div class="relative flex flex-col items-center justify-center my-2">
+                                <svg viewBox="0 0 220 120" class="w-full max-w-[205px] overflow-visible">
+                                    <defs>
+                                        <pattern id="diagGreen" width="6" height="6" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                                            <rect width="6" height="6" fill="#9BE844"/>
+                                            <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(255,255,255,0.45)" stroke-width="3" />
+                                        </pattern>
+                                        <pattern id="diagLime" width="6" height="6" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                                            <rect width="6" height="6" fill="#C9F242"/>
+                                            <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(255,255,255,0.45)" stroke-width="3" />
+                                        </pattern>
+                                    </defs>
+
+                                    <!-- Background Gray Arch -->
+                                    <path d="M 20 105 A 90 90 0 0 1 200 105" fill="none" stroke="#F2F3F5" stroke-width="24" stroke-linecap="butt" />
+
+                                    <!-- Segment 1: Left Bottom Lime-Yellow -->
+                                    <path d="M 20 105 A 90 90 0 0 1 48 40" fill="none" stroke="url(#diagLime)" stroke-width="24" stroke-dasharray="72 300" />
+
+                                    <!-- Segment 2: Top Left Light Green -->
+                                    <path d="M 52 36 A 90 90 0 0 1 115 15" fill="none" stroke="url(#diagGreen)" stroke-width="24" />
+
+                                    <!-- Segment 3: Top Right Solid Green -->
+                                    <path d="M 120 16 A 90 90 0 0 1 172 42" fill="none" stroke="#7ED321" stroke-width="24" />
+                                </svg>
+
+                                <!-- Gauge Center Label -->
+                                <div class="absolute bottom-1 text-center">
+                                    <span class="font-display font-bold text-[22px] text-gray-900 block leading-none">75%</span>
+                                    <span class="text-[10px] text-gray-400">Of monthly income saved</span>
+                                </div>
+                            </div>
+
+                            <p class="text-[10.5px] text-gray-500 leading-snug">
+                                Based on aggregated transaction metrics over the past 30 days
+                            </p>
+                        </div>
+
+                        <!-- Card 3: Goal Tracker -->
+                        <div class="col-span-12 lg:col-span-4 bg-white rounded-[22px] p-4 shadow-card flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-display font-bold text-[14.5px] text-gray-900">Goal tracker</h3>
+                                <button class="px-2.5 py-1 bg-white hover:bg-gray-50 rounded-lg text-[11px] font-semibold text-gray-800 border border-gray-200 flex items-center gap-1 shadow-sm">
+                                    <i class="ph-bold ph-plus text-[10px]"></i>
+                                    <span>Add goals</span>
+                                </button>
+                            </div>
+
+                            <!-- This Year Goal -->
+                            <div class="mb-2">
+                                <p class="text-[10px] text-gray-400 font-medium mb-1.5">This year</p>
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-10 h-10 rounded-xl bg-[#F6F7F9] flex items-center justify-center text-xl flex-shrink-0 border border-gray-100">
+                                        💵
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between text-[11px] mb-1">
+                                            <span class="font-semibold text-gray-800">Reserve</span>
+                                            <span class="text-[10.5px] font-semibold text-gray-800">$7,000 <span class="text-gray-400 font-normal">/ $10,000</span></span>
+                                        </div>
+                                        <div class="w-full h-2.5 bg-[#F2F3F5] rounded-full overflow-hidden">
+                                            <div class="w-[70%] h-full stripe-green rounded-full"></div>
+                                        </div>
+                                        <p class="text-[9.5px] text-gray-400 mt-0.5">Left to save 4 months</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Long Term Goals -->
+                            <div class="space-y-2.5">
+                                <p class="text-[10px] text-gray-400 font-medium">Long term</p>
+
+                                <!-- Travel -->
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-10 h-10 rounded-xl bg-[#F6F7F9] flex items-center justify-center text-xl flex-shrink-0 border border-gray-100">
+                                        🧳
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between text-[11px] mb-1">
+                                            <span class="font-semibold text-gray-800">Travel</span>
+                                            <span class="text-[10.5px] font-semibold text-gray-800">$2,500 <span class="text-gray-400 font-normal">/ $4,000</span></span>
+                                        </div>
+                                        <div class="w-full h-2.5 bg-[#F2F3F5] rounded-full overflow-hidden">
+                                            <div class="w-[62%] h-full stripe-orange rounded-full"></div>
+                                        </div>
+                                        <p class="text-[9.5px] text-gray-400 mt-0.5">Left to save 3 months</p>
+                                    </div>
+                                </div>
+
+                                <!-- Car -->
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-10 h-10 rounded-xl bg-[#F6F7F9] flex items-center justify-center text-xl flex-shrink-0 border border-gray-100">
+                                        🚗
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between text-[11px] mb-1">
+                                            <span class="font-semibold text-gray-800">Car</span>
+                                            <span class="text-[10.5px] font-semibold text-gray-800">$1,600 <span class="text-gray-400 font-normal">/ $20,000</span></span>
+                                        </div>
+                                        <div class="w-full h-2.5 bg-[#F2F3F5] rounded-full overflow-hidden">
+                                            <div class="w-[14%] h-full stripe-orange rounded-full"></div>
+                                        </div>
+                                        <p class="text-[9.5px] text-gray-400 mt-0.5">Left to save 3 years 6 months</p>
+                                    </div>
+                                </div>
+
+                                <!-- Real estate -->
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-10 h-10 rounded-xl bg-[#F6F7F9] flex items-center justify-center text-xl flex-shrink-0 border border-gray-100">
+                                        🏠
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between text-[11px] mb-1">
+                                            <span class="font-semibold text-gray-800">Real estate</span>
+                                            <span class="text-[10.5px] font-semibold text-gray-800">$8,300 <span class="text-gray-400 font-normal">/ $70,000</span></span>
+                                        </div>
+                                        <div class="w-full h-2.5 bg-[#F2F3F5] rounded-full overflow-hidden">
+                                            <div class="w-[18%] h-full stripe-orange rounded-full"></div>
+                                        </div>
+                                        <p class="text-[9.5px] text-gray-400 mt-0.5">Left to save 5 years 8 months</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ================= RIGHT COLUMN (STACKS SIDE-BY-SIDE ON MD/LG, 3 COLS ON XL) ================= -->
+                <div class="col-span-12 xl:col-span-3 grid grid-cols-1 md:grid-cols-2 xl:flex xl:flex-col gap-4">
+
+                    <!-- TOP CARD: MY CARD, QUICK ACTIONS & QUICK PAYMENT -->
+                    <div class="bg-white rounded-[22px] p-4 shadow-card flex flex-col justify-between">
+                        <!-- Header -->
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-display font-bold text-[14.5px] text-gray-900">My card</h3>
+                                <p class="text-[11px] text-gray-400">Quick actions</p>
+                            </div>
+                            <button class="px-2.5 py-1 bg-white hover:bg-gray-50 rounded-lg text-[11px] font-semibold text-gray-800 border border-gray-200 flex items-center gap-1 shadow-sm">
+                                <i class="ph-bold ph-plus text-[10px]"></i>
+                                <span>Add card</span>
+                            </button>
+                        </div>
+
+                        <!-- Cards Carousel (Green Visa + Peeking Silver Card) -->
+                        <div class="flex gap-2.5 overflow-hidden mb-4">
+                            <!-- Main Green Debit Card -->
+                            <div class="w-[82%] flex-shrink-0 h-[132px] rounded-2xl p-3.5 text-white flex flex-col justify-between relative overflow-hidden" style="background: linear-gradient(135deg, #9BE844 0%, #76C922 100%);">
+                                <!-- Decorative subtle arcs -->
+                                <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full border border-white/20 pointer-events-none"></div>
+                                <div class="absolute -right-4 -bottom-10 w-32 h-32 rounded-full border border-white/15 pointer-events-none"></div>
+
+                                <div class="flex items-center justify-between z-10">
+                                    <span class="text-[10.5px] font-medium text-white/90">Debit card</span>
+                                    <span class="font-display font-extrabold italic text-[13px] tracking-wider">VISA</span>
+                                </div>
+
+                                <!-- Chip Icon -->
+                                <div class="my-auto z-10">
+                                    <div class="w-7 h-5 rounded-[4px] bg-white/30 border border-white/50 flex items-center justify-center">
+                                        <div class="w-4 h-3 border border-white/60 rounded-[2px]"></div>
+                                    </div>
+                                </div>
+
+                                <div class="z-10">
+                                    <p class="text-[11.5px] font-semibold tracking-widest mb-1">•••• •••• •••• 7890</p>
+                                    <div class="flex items-center justify-between text-[9.5px] text-white/90">
+                                        <span>Michael Johnson</span>
+                                        <span>03/30</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Peeking Secondary Credit Card -->
+                            <div class="w-[35%] flex-shrink-0 h-[132px] rounded-2xl p-3 bg-gradient-to-br from-gray-100 to-gray-200/80 border border-gray-200/60 text-gray-700 flex flex-col justify-between">
+                                <span class="text-[10px] font-medium text-gray-500 whitespace-nowrap">Credit card</span>
+                                <div class="my-auto">
+                                    <div class="w-6 h-4 rounded-[3px] bg-gray-300/70 border border-gray-400/30"></div>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold tracking-wider mb-1 whitespace-nowrap">•••• ••••</p>
+                                    <p class="text-[9px] text-gray-500 truncate">Michael John</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5 Quick Action Buttons -->
+                        <div class="grid grid-cols-5 gap-1.5 mb-4">
+                            <button class="flex flex-col items-center gap-1 group">
+                                <div class="w-10 h-10 rounded-xl bg-[#F7F8FA] group-hover:bg-gray-100 border border-gray-100 flex items-center justify-center text-gray-700 transition-colors">
+                                    <i class="ph ph-arrow-circle-up text-[17px]"></i>
+                                </div>
+                                <span class="text-[10px] text-gray-600 font-medium">Top up</span>
+                            </button>
+                            <button class="flex flex-col items-center gap-1 group">
+                                <div class="w-10 h-10 rounded-xl bg-[#F7F8FA] group-hover:bg-gray-100 border border-gray-100 flex items-center justify-center text-gray-700 transition-colors">
+                                    <i class="ph ph-paper-plane-tilt text-[17px]"></i>
+                                </div>
+                                <span class="text-[10px] text-gray-600 font-medium">Send</span>
+                            </button>
+                            <button class="flex flex-col items-center gap-1 group">
+                                <div class="w-10 h-10 rounded-xl bg-[#F7F8FA] group-hover:bg-gray-100 border border-gray-100 flex items-center justify-center text-gray-700 transition-colors">
+                                    <i class="ph ph-hand-Arrow-down text-[17px] ph-download-simple"></i>
+                                </div>
+                                <span class="text-[10px] text-gray-600 font-medium">Request</span>
+                            </button>
+                            <button class="flex flex-col items-center gap-1 group">
+                                <div class="w-10 h-10 rounded-xl bg-[#F7F8FA] group-hover:bg-gray-100 border border-gray-100 flex items-center justify-center text-gray-700 transition-colors">
+                                    <i class="ph ph-clock-counter-clockwise text-[17px]"></i>
+                                </div>
+                                <span class="text-[10px] text-gray-600 font-medium">History</span>
+                            </button>
+                            <button class="flex flex-col items-center gap-1 group">
+                                <div class="w-10 h-10 rounded-xl bg-[#F7F8FA] group-hover:bg-gray-100 border border-gray-100 flex items-center justify-center text-gray-700 transition-colors">
+                                    <i class="ph-bold ph-dots-three text-[17px]"></i>
+                                </div>
+                                <span class="text-[10px] text-gray-600 font-medium">More</span>
+                            </button>
+                        </div>
+
+                        <!-- Quick Payment Contacts -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2.5">
+                                <h4 class="font-display font-bold text-[12px] text-gray-900">Quick payment</h4>
+                                <button class="text-gray-400 hover:text-gray-700">
+                                    <i class="ph-bold ph-dots-three-vertical text-xs"></i>
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-6 gap-1.5">
+                                <div class="flex flex-col items-center gap-1 cursor-pointer group">
+                                    <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80" alt="Davis" class="w-9 h-9 rounded-xl object-cover group-hover:scale-105 transition-transform">
+                                    <span class="text-[9.5px] text-gray-600 font-medium">Davis</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 cursor-pointer group">
+                                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Elli" class="w-9 h-9 rounded-xl object-cover group-hover:scale-105 transition-transform">
+                                    <span class="text-[9.5px] text-gray-600 font-medium">Elli</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 cursor-pointer group">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Leo" class="w-9 h-9 rounded-xl object-cover group-hover:scale-105 transition-transform">
+                                    <span class="text-[9.5px] text-gray-600 font-medium">Leo</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 cursor-pointer group">
+                                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" alt="Amanda" class="w-9 h-9 rounded-xl object-cover group-hover:scale-105 transition-transform">
+                                    <span class="text-[9.5px] text-gray-600 font-medium">Amanda</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 cursor-pointer group">
+                                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80" alt="Ann" class="w-9 h-9 rounded-xl object-cover group-hover:scale-105 transition-transform">
+                                    <span class="text-[9.5px] text-gray-600 font-medium">Ann</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 cursor-pointer group">
+                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80" alt="Sin" class="w-9 h-9 rounded-xl object-cover group-hover:scale-105 transition-transform">
+                                    <span class="text-[9.5px] text-gray-600 font-medium">Sin</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTTOM CARD: TRANSACTION HISTORY -->
+                    <div class="bg-white rounded-[22px] p-4 shadow-card flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-display font-bold text-[14.5px] text-gray-900">Transaction history</h3>
+                                <button class="flex items-center gap-1.5 px-2.5 py-1 bg-[#F7F8FA] rounded-lg text-[11px] font-medium text-gray-700 border border-gray-200/60">
+                                    <span>7d</span>
+                                    <i class="ph ph-caret-down text-[10px]"></i>
+                                </button>
+                            </div>
+
+                            <!-- Table Header -->
+                            <div class="flex items-center justify-between text-[10.5px] text-gray-400 font-medium pb-2 border-b border-gray-100">
+                                <span class="flex items-center gap-1 cursor-pointer hover:text-gray-600">
+                                    <i class="ph ph-arrows-down-up text-[11px]"></i> Name
+                                </span>
+                                <span>Amount</span>
+                            </div>
+                        </div>
+
+                        <!-- Transactions List -->
+                        <div class="space-y-2.5 my-auto pt-2">
+                            <!-- Item 1: TD -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-lg bg-[#54B848] text-white font-display font-extrabold text-[12px] flex items-center justify-center flex-shrink-0">
+                                        TD
+                                    </div>
+                                    <div class="leading-tight">
+                                        <p class="text-[11.5px] font-semibold text-gray-900">Dividend payot</p>
+                                        <p class="text-[9.5px] text-gray-400">25 Feb 2025</p>
+                                    </div>
+                                </div>
+                                <div class="text-right leading-tight">
+                                    <p class="text-[11.5px] font-bold text-gray-900">+ $1,100</p>
+                                    <p class="text-[9.5px] text-[#65A30D] font-medium">Completed</p>
+                                </div>
+                            </div>
+
+                            <!-- Item 2: Corporate subscriptions -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-lg bg-[#112233] text-[#38BDF8] flex items-center justify-center flex-shrink-0">
+                                        <i class="ph-fill ph-cloud text-base"></i>
+                                    </div>
+                                    <div class="leading-tight">
+                                        <p class="text-[11.5px] font-semibold text-gray-900">Corporate subscriptions</p>
+                                        <p class="text-[9.5px] text-gray-400">25 Feb 2025</p>
+                                    </div>
+                                </div>
+                                <div class="text-right leading-tight">
+                                    <p class="text-[11.5px] font-bold text-gray-900">- $6,400</p>
+                                    <p class="text-[9.5px] text-[#F59E0B] font-medium">Declined</p>
+                                </div>
+                            </div>
+
+                            <!-- Item 3: Investment in ETF -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-lg bg-gray-900 text-white font-serif font-bold text-[13px] flex items-center justify-center flex-shrink-0">
+                                        V
+                                    </div>
+                                    <div class="leading-tight">
+                                        <p class="text-[11.5px] font-semibold text-gray-900">Investment in ETF</p>
+                                        <p class="text-[9.5px] text-gray-400">21 Feb 2025</p>
+                                    </div>
+                                </div>
+                                <div class="text-right leading-tight">
+                                    <p class="text-[11.5px] font-bold text-gray-900">- $900</p>
+                                    <p class="text-[9.5px] text-[#65A30D] font-medium">Completed</p>
+                                </div>
+                            </div>
+
+                            <!-- Item 4: Consulting services -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-lg bg-gray-900 text-white font-display font-bold text-[9.5px] tracking-tighter flex items-center justify-center flex-shrink-0">
+                                        CNX
+                                    </div>
+                                    <div class="leading-tight">
+                                        <p class="text-[11.5px] font-semibold text-gray-900">Consulting services</p>
+                                        <p class="text-[9.5px] text-gray-400">21 Feb 2025</p>
+                                    </div>
+                                </div>
+                                <div class="text-right leading-tight">
+                                    <p class="text-[11.5px] font-bold text-gray-900">- $2,100</p>
+                                    <p class="text-[9.5px] text-[#65A30D] font-medium">Completed</p>
+                                </div>
+                            </div>
+
+                            <!-- Item 5: Equipment purchase -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-lg bg-gray-900 text-white font-bold text-[8.5px] flex items-center justify-center flex-shrink-0">
+                                        amazon
+                                    </div>
+                                    <div class="leading-tight">
+                                        <p class="text-[11.5px] font-semibold text-gray-900">Equipment purchase</p>
+                                        <p class="text-[9.5px] text-gray-400">20 Feb 2025</p>
+                                    </div>
+                                </div>
+                                <div class="text-right leading-tight">
+                                    <p class="text-[11.5px] font-bold text-gray-900">- $1,700</p>
+                                    <p class="text-[9.5px] text-[#65A30D] font-medium">Completed</p>
+                                </div>
+                            </div>
+
+                            <!-- Item 6: Elli Harper -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Elli Harper" class="w-8 h-8 rounded-lg object-cover flex-shrink-0">
+                                    <div class="leading-tight">
+                                        <p class="text-[11.5px] font-semibold text-gray-900">Elli Harper</p>
+                                        <p class="text-[9.5px] text-gray-400">15 Feb 2025</p>
+                                    </div>
+                                </div>
+                                <div class="text-right leading-tight">
+                                    <p class="text-[11.5px] font-bold text-gray-900">+ $600</p>
+                                    <p class="text-[9.5px] text-[#65A30D] font-medium">Completed</p>
+                                </div>
+                            </div>
+
+                            <!-- Item 7: Davis Rowen -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80" alt="Davis Rowen" class="w-8 h-8 rounded-lg object-cover flex-shrink-0">
+                                    <div class="leading-tight">
+                                        <p class="text-[11.5px] font-semibold text-gray-900">Davis Rowen</p>
+                                        <p class="text-[9.5px] text-gray-400">15 Feb 2025</p>
+                                    </div>
+                                </div>
+                                <div class="text-right leading-tight">
+                                    <p class="text-[11.5px] font-bold text-gray-900">+ $800</p>
+                                    <p class="text-[9.5px] text-[#65A30D] font-medium">Completed</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function toggleSubmenu() {
+            const submenu = document.getElementById('tx-submenu');
+            const chevron = document.getElementById('tx-chevron');
+            if (submenu.style.display === 'none') {
+                submenu.style.display = 'block';
+                chevron.style.transform = 'rotate(0deg)';
+            } else {
+                submenu.style.display = 'none';
+                chevron.style.transform = 'rotate(-90deg)';
+            }
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", sans-serif;
+
+  --color-canvas: #F2F3F5;
+  --color-surface: #FFFFFF;
+  --color-brand: #8CE533;
+  --color-brand-strong: #8FD93B;
+  --color-brand-soft: #B9EE7B;
+  --color-lime-brand: #E2F542;
+  --color-orange-brand: #FDB65E;
+  --color-orange-soft: #FED08E;
+
+  --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.02), 0 1px 3px -1px rgba(0, 0, 0, 0.02);
+  --shadow-float: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: #111827;
+  font-family: var(--font-sans);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Custom Hatched / Striped Diagonal Fills */
+.stripe-green {
+  background-color: #8FD93B;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.25),
+    rgba(255, 255, 255, 0.25) 3px,
+    transparent 3px,
+    transparent 6px
+  );
+}
+
+.stripe-orange {
+  background-color: #FDB65E;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.28),
+    rgba(255, 255, 255, 0.28) 3px,
+    transparent 3px,
+    transparent 6px
+  );
+}
+
+.stripe-yellow {
+  background-color: #E2F542;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.35) 3px,
+    transparent 3px,
+    transparent 6px
+  );
+}

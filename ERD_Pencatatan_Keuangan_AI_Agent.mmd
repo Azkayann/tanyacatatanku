@@ -1,0 +1,17 @@
+erDiagram
+    USERS ||--o{ ACCOUNTS : owns
+    USERS ||--o{ CATEGORIES : creates
+    USERS ||--o{ TRANSACTIONS : records
+    USERS ||--o{ API_TOKENS : has
+    USERS ||--o{ BUDGETS : sets
+    USERS ||--o{ SAVINGS_GOALS : tracks
+    USERS ||--o{ RECURRING_TRANSACTIONS : schedules
+    USERS ||--o{ NOTIFICATIONS : receives
+    USERS ||--o{ API_REQUEST_LOGS : generates
+    USERS ||--o{ AUDIT_LOGS : performs
+
+    ACCOUNTS ||--o{ TRANSACTIONS : contains
+    CATEGORIES o|--o{ TRANSACTIONS : classifies
+    CATEGORIES o|--o{ BUDGETS : limits
+    API_TOKENS o|--o{ API_REQUEST_LOGS : authenticates
+    USERS ||--o{ REPORT_TEMPLATES : creates
