@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ApiToken;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -13,12 +14,23 @@ class ApiTokenController extends Controller
     {
         $user = $request->user();
         $tokens = $user->apiTokens()
-            ->select('id', 'name', 'abilities', 'last_used_at', 'expires_at', 'created_at')
+            ->select('id', 'name', 'abilities', 'token_encrypted', 'last_used_at', 'expires_at', 'created_at')
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $data = $tokens->map(fn ($t) => [
+            'id' => $t->id,
+            'name' => $t->name,
+            'abilities' => $t->abilities,
+            // Token selalu bisa ditampilkan ulang (dienkripsi via APP_KEY), bukan sekali lihat
+            'token' => $t->token_encrypted ?? null,
+            'last_used_at' => $t->last_used_at,
+            'expires_at' => $t->expires_at,
+            'created_at' => $t->created_at,
+        ]);
+
         return response()->json([
-            'data' => $tokens,
+            'data' => $data,
             'meta' => ['request_id' => 'req_' . str()->uuid()],
         ]);
     }
@@ -39,8 +51,11 @@ class ApiTokenController extends Controller
         $token = $user->apiTokens()->create([
             'name' => $validated['name'],
             'token_hash' => $tokenHash,
+            'token_encrypted' => $tokenPlain,
             'abilities' => $validated['abilities'],
         ]);
+
+        AuditLog::log($user, 'token.created', 'api_token', $token->id, 'success', $request->ip());
 
         return response()->json([
             'data' => [
@@ -50,7 +65,7 @@ class ApiTokenController extends Controller
                 'abilities' => $token->abilities,
                 'created_at' => $token->created_at,
             ],
-            'message' => 'Token berhasil dibuat. Simpan token ini sekarang; tidak akan ditampilkan lagi.',
+            'message' => 'Token berhasil dibuat. Token ini akan selalu bisa dilihat kembali di daftar token.',
             'meta' => ['request_id' => 'req_' . str()->uuid()],
         ], 201);
     }
@@ -60,6 +75,8 @@ class ApiTokenController extends Controller
         $user = $request->user();
         $token = $user->apiTokens()->findOrFail($id);
         $token->delete();
+
+        AuditLog::log($user, 'token.revoked', 'api_token', $id, 'success', $request->ip());
 
         return response()->json([
             'message' => 'Token berhasil dicabut.',

@@ -17,6 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'api.token' => \App\Http\Middleware\VerifyApiToken::class,
         ]);
     })
+    ->withSchedule(function (Illuminate\Console\Scheduling\Schedule $schedule): void {
+        // F-07: proses transaksi berulang yang jatuh tempo minimal sekali sehari.
+        $schedule->command('recurring:process')
+            ->dailyAt('03:00')->timezone('Asia/Jakarta')
+            ->withoutOverlapping();
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

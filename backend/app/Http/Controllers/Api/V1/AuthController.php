@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\ApiToken;
+use App\Models\AuditLog;
+use App\Models\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -78,12 +80,22 @@ class AuthController extends Controller
             ],
         ]);
 
+        UserNotification::create([
+            'user_id' => $user->id,
+            'title' => 'Selamat datang di tanyauangku!',
+            'message' => 'Akun Anda berhasil dibuat. Mulai catat pemasukan dan pengeluaran pertama Anda.',
+            'type' => 'success',
+        ]);
+
+        AuditLog::log($user, 'user.register', 'user', $user->id, 'success', $request->ip());
+
         return response()->json([
             'data' => [
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'role' => $user->role ?? 'user',
                 ],
                 'default_account' => [
                     'id' => $account->id,
@@ -115,6 +127,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            AuditLog::log(null, 'auth.login_failed', 'user', $request->email, 'failed', $request->ip());
             return response()->json([
                 'error' => [
                     'code' => 'INVALID_CREDENTIALS',
@@ -140,12 +153,15 @@ class AuthController extends Controller
             ],
         ]);
 
+        AuditLog::log($user, 'auth.login', 'session', $user->id, 'success', $request->ip());
+
         return response()->json([
             'data' => [
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'role' => $user->role ?? 'user',
                 ],
                 'token' => $tokenPlain,
             ],

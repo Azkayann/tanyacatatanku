@@ -15,7 +15,18 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'is_active',
     ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 
     protected $hidden = [
         'password',
@@ -45,8 +56,28 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
+    public function transfers()
+    {
+        return $this->hasMany(Transfer::class);
+    }
+
     public function apiTokens()
     {
         return $this->hasMany(ApiToken::class);
+    }
+
+    public function budgets()
+    {
+        return $this->hasMany(Budget::class);
+    }
+
+    public function recurrings()
+    {
+        return $this->hasMany(Recurring::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(UserNotification::class);
     }
 }

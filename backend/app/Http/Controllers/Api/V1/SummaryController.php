@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\ReportService;
 use Illuminate\Http\Request;
 
 class SummaryController extends Controller
@@ -14,41 +15,20 @@ class SummaryController extends Controller
         $from = $request->get('from', now()->startOfMonth()->toDateString());
         $to = $request->get('to', now()->endOfMonth()->toDateString());
 
-        $transactions = $user->transactions()
-            ->whereBetween('occurred_at', [$from, $to])
-            ->whereIn('type', ['income', 'expense'])
-            ->get();
-
-        $incomeTotal = $transactions->where('type', 'income')->sum('amount');
-        $expenseTotal = $transactions->where('type', 'expense')->sum('amount');
-        $netCashFlow = $incomeTotal - $expenseTotal;
-
-        // Expense breakdown by category
-        $expenseByCategory = $user->transactions()
-            ->with('category')
-            ->whereBetween('occurred_at', [$from, $to])
-            ->where('type', 'expense')
-            ->get()
-            ->groupBy('category_id')
-            ->map(function ($items) {
-                $first = $items->first();
-                return [
-                    'category_id' => $first->category_id,
-                    'category_name' => $first->category?->name ?? 'Tidak Berkategori',
-                    'total' => $items->sum('amount'),
-                ];
-            })
-            ->values();
+        // Satu sumber angka: ReportService (F-08). Tanpa rumus ganda di sini.
+        $summary = ReportService::summary($user, $from, $to);
 
         return response()->json([
             'data' => [
-                'period' => ['from' => $from, 'to' => $to],
-                'currency' => 'IDR',
-                'income_total' => number_format($incomeTotal, 2, '.', ''),
-                'expense_total' => number_format($expenseTotal, 2, '.', ''),
-                'net_cash_flow' => number_format($netCashFlow, 2, '.', ''),
-                'transaction_count' => $transactions->count(),
-                'expense_by_category' => $expenseByCategory,
+                'period' => $summary['period'],
+                'currency' => $summary['currency'],
+                'income_total' => number_format($summary['income_total'], 2, '.', ''),
+                'expense_total' => number_format($summary['expense_total'], 2, '.', ''),
+                'net_cash_flow' => number_format($summary['net_cash_flow'], 2, '.', ''),
+                'adjustment_total' => number_format($summary['adjustment_total'], 2, '.', ''),
+                'transfer_total' => number_format($summary['transfer_total'], 2, '.', ''),
+                'transaction_count' => $summary['transaction_count'],
+                'expense_by_category' => $summary['expense_by_category'],
             ],
             'meta' => [
                 'request_id' => 'req_' . str()->uuid(),

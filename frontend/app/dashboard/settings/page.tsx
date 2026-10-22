@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ApiClient from "../../../lib/api";
 import { AppShell } from "../../components/AppShell";
@@ -8,18 +8,67 @@ import { AppShell } from "../../components/AppShell";
 export default function SettingsPage() {
   const router = useRouter();
   const [user, setUser] = useState({
-    name: "John Doe",
-    email: "user@example.com",
+    name: "",
+    email: "",
     currency: "IDR",
     timezone: "Asia/Jakarta",
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        setLoading(true);
+        const response = await ApiClient.fetchMe();
+        setUser({
+          name: response.data.name,
+          email: response.data.email,
+          currency: response.data.currency || "IDR",
+          timezone: response.data.timezone || "Asia/Jakarta",
+        });
+        setError(null);
+      } catch (err: any) {
+        setError(err.message || "Gagal memuat profil.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProfile();
+  }, []);
 
   const handleLogout = async () => {
-    setLoading(true);
+    setLogoutLoading(true);
     ApiClient.logout();
   };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      const response = await ApiClient.updateMe({ name: user.name.trim() });
+      setUser((u) => ({ ...u, name: response.data.name }));
+      setError("Profil berhasil disimpan.");
+    } catch (err: any) {
+      setError(err.message || "Gagal menyimpan profil.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <AppShell isAdmin={false}>
+        <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-card text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#8CE533] border-t-transparent"></div>
+          <p className="text-sm text-gray-600 mt-3">Memuat pengaturan...</p>
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell isAdmin={false}>
@@ -34,6 +83,16 @@ export default function SettingsPage() {
             </p>
           </div>
         </div>
+
+        {error && (
+          <div className={`${error.includes("berhasil") ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200"} border p-4 rounded-xl flex items-center gap-3`}>
+            <i className={`${error.includes("berhasil") ? "ph-check-circle text-green-600" : "ph ph-warning-circle text-red-600"} text-xl`}></i>
+            <div>
+              <p className={`text-sm font-semibold ${error.includes("berhasil") ? "text-green-800" : "text-red-900"}`}>{error.includes("berhasil") ? "Sukses" : "Gagal"}</p>
+              <p className={`text-xs ${error.includes("berhasil") ? "text-green-700" : "text-red-700"}`}>{error}</p>
+            </div>
+          </div>
+        )}
 
         {/* Profile Section */}
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-card">
@@ -57,8 +116,8 @@ export default function SettingsPage() {
               <input
                 type="email"
                 value={user.email}
-                onChange={(e) => setUser({ ...user, email: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none"
+                disabled
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-gray-500 bg-gray-50"
               />
             </div>
             <div>
@@ -84,8 +143,12 @@ export default function SettingsPage() {
               />
             </div>
           </div>
-          <button className="mt-6 px-4 py-2 bg-[#8CE533] hover:bg-[#7cd02a] text-gray-900 font-bold text-sm rounded-xl transition-all">
-            Simpan Perubahan
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="mt-6 px-4 py-2 bg-[#8CE533] hover:bg-[#7cd02a] text-gray-900 font-bold text-sm rounded-xl transition-all disabled:opacity-60"
+          >
+            {saving ? "Menyimpan..." : "Simpan Perubahan"}
           </button>
         </div>
 
@@ -117,11 +180,11 @@ export default function SettingsPage() {
             </div>
             <button
               onClick={handleLogout}
-              disabled={loading}
+              disabled={logoutLoading}
               className="px-6 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-sm rounded-xl transition-all flex items-center gap-2 disabled:opacity-60"
             >
               <i className="ph ph-sign-out"></i>
-              {loading ? "MengKeluar..." : "Keluar"}
+              {logoutLoading ? "Keluar..." : "Keluar"}
             </button>
           </div>
         </div>

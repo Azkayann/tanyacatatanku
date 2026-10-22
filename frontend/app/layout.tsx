@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -13,7 +8,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Catatan Keuangan AI Agent",
+  title: "tanyauangku",
   description: "Aplikasi pencatatan keuangan pribadi terintegrasi AI Agent",
 };
 
@@ -23,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${inter.variable} ${plusJakartaSans.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[#F2F3F5] text-[#111827] font-sans selection:bg-[#8CE533] selection:text-[#111827]">
+    <html lang="id" className={`${plusJakartaSans.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-[#0C0C0E] text-[#F5F5F5] font-sans selection:bg-[rgba(147,197,253,0.35)] selection:text-[#F5F5F5]">
         {children}
       </body>
     </html>

@@ -13,12 +13,18 @@ class Account extends Model {
         'user_id',
         'name',
         'balance',
+        'initial_balance',
         'currency',
     ];
 
     protected $casts = [
         'balance' => 'decimal:2',
+        'initial_balance' => 'decimal:2',
     ];
+
+    public function getMutasiAttribute(): string {
+        return number_format((float) $this->balance - (float) $this->initial_balance, 2, '.', '');
+    }
 
     public function user() {
         return $this->belongsTo(User::class);

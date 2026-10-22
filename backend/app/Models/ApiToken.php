@@ -13,6 +13,7 @@ class ApiToken extends Model {
         'user_id',
         'name',
         'token_hash',
+        'token_encrypted',
         'abilities',
         'last_used_at',
         'expires_at',
@@ -20,6 +21,7 @@ class ApiToken extends Model {
 
     protected $casts = [
         'abilities' => 'array',
+        'token_encrypted' => 'encrypted',
         'last_used_at' => 'datetime',
         'expires_at' => 'datetime',
     ];

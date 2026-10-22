@@ -39,7 +39,7 @@ export default function LoginPage() {
               CK
             </div>
             <span className="font-extrabold text-xl tracking-tight text-gray-900 font-display">
-              CatatanKeuangan<span className="text-[#65A30D]">.ai</span>
+              tanyauangku
             </span>
           </Link>
 

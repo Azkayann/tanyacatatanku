@@ -1,14 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppShell } from "../../components/AppShell";
+import ApiClient from "../../../lib/api";
 
 export default function AdminUsersPage() {
-  const [users] = useState([
-    { id: "usr_001", name: "John Doe", email: "user@example.com", role: "user", created: "2026-09-15", is_active: true },
-    { id: "usr_002", name: "Jane Smith", email: "jane@example.com", role: "user", created: "2026-10-01", is_active: true },
-    { id: "usr_003", name: "Admin User", email: "admin@example.com", role: "admin", created: "2026-08-01", is_active: true },
-  ]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadUsers() {
+      try {
+        setLoading(true);
+        const response = await ApiClient.fetchAdminUsers({ per_page: 100 });
+        setUsers(response.data);
+        setError(null);
+      } catch (err: any) {
+        setError(err.message || "Gagal memuat data pengguna.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadUsers();
+  }, []);
 
   return (
     <AppShell isAdmin={true}>
@@ -20,7 +36,25 @@ export default function AdminUsersPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
+        {loading && (
+          <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-card text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#8CE533] border-t-transparent"></div>
+            <p className="text-sm text-gray-600 mt-3">Memuat data pengguna...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 p-4 rounded-xl flex items-center gap-3">
+            <i className="ph ph-warning-circle text-red-600 text-xl"></i>
+            <div>
+              <p className="text-sm font-semibold text-red-900">Gagal Memuat Data</p>
+              <p className="text-xs text-red-700">{error}</p>
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -58,13 +92,14 @@ export default function AdminUsersPage() {
                         {user.is_active ? "Aktif" : "Nonaktif"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{user.created}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{user.created_at}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
+        )}
       </div>
     </AppShell>
   );

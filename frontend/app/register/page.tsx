@@ -52,7 +52,7 @@ export default function RegisterPage() {
                 CK
               </div>
               <span className="font-extrabold text-xl tracking-tight text-gray-900 font-display">
-                CatatanKeuangan<span className="text-[#65A30D]">.ai</span>
+                tanyauangku
               </span>
             </Link>
           </div>
@@ -120,7 +120,7 @@ export default function RegisterPage() {
               CK
             </div>
             <span className="font-extrabold text-xl tracking-tight text-gray-900 font-display">
-              CatatanKeuangan<span className="text-[#65A30D]">.ai</span>
+              tanyauangku
             </span>
           </Link>
 
