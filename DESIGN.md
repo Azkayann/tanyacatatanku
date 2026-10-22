@@ -1,427 +1,289 @@
-# DESIGN.md — Design System & UI Guidelines
+## Overview
 
-Dokumen ini menjadi acuan visual dan perilaku antarmuka untuk aplikasi pencatatan keuangan pribadi dengan integrasi AI Agent. Gunakan bersama `CLAUDE.md`, PRD, ERD, dan spesifikasi API. Referensi visual utama dashboard adalah file `acru_financial_dashboard (1).html` yang diberikan pengguna.
+Framer's marketing canvas is a near-pure black artboard. The dominant surface is `{colors.canvas}` — almost pure black with a faint warmth — and on top of it sits oversized white display type set in **GT Walsheim Medium** with letter-spacing pulled to extreme negative values (-5.5px on the 110px display, -4.25px on the 85px hero). The page reads like a poster: one assertive statement per band, generous breathing room above and below.
 
-> **Aturan utama:** jadikan HTML ACRU sebagai referensi gaya visual, bukan sebagai template produk yang harus disalin mentah. Pertahankan bahasa visualnya, tetapi sesuaikan konten, komponen, dan prioritas informasi dengan kebutuhan aplikasi keuangan pribadi. Jangan menyalin nama ACRU, data demo, kartu pembayaran, fitur transfer, atau menu yang tidak termasuk ruang lingkup produk.
+The single accent is `{colors.accent-blue}` — used scarcely, mostly for hyperlinks, selection halos, and a subtle blue-tinted shadow ring on focused inputs. The brand chrome itself is monochrome: white pill buttons, charcoal cards, gray secondary text. What makes Framer distinctive is the rhythm break — every few sections the page drops in a **vibrant gradient atmosphere card**: a magenta-violet spotlight, a sunset-orange wash, a coral-pink panel. These aren't section backgrounds; they're individual cards arranged in a card grid, each one a small living poster that shows what Framer can produce.
 
-## 1. Tujuan Desain
+Body type is **Inter Variable**, with Framer leaning hard into Inter's character variants (`cv01`, `cv05`, `cv09`, `cv11`, `ss03`, `ss07`, `dlig`) — the result is a body voice that feels custom-tuned, with single-storey "a", straight-leg "l", and tabular figures. There's no light mode on the marketing site; the brand IS dark.
 
-- Membuat aplikasi keuangan yang modern, bersih, mudah dipindai, dan nyaman digunakan setiap hari.
-- Menampilkan data keuangan dengan hierarki visual yang jelas tanpa memenuhi layar dengan terlalu banyak dekorasi.
-- Menggunakan dashboard sebagai ringkasan yang membantu pengguna memahami kondisi keuangan dan melakukan tindakan utama dengan cepat.
-- Menjaga konsistensi visual pada seluruh halaman tanpa memaksa setiap halaman menggunakan susunan dashboard yang sama.
-- Mendukung desktop, tablet, dan ponsel.
-- Memastikan angka, status, grafik, dan tindakan tetap mudah dibaca serta dapat diakses.
+**Key Characteristics:**
+- Black-canvas marketing system: `{colors.canvas}` is the surface for hero, body, pricing, FAQ, and footer alike — no light interludes.
+- Massive negative letter-spacing on display sizes (-5.5px / -4.25px / -3.1px) creates a poster-grade headline cadence.
+- White pill (`{components.button-primary}`) is the only primary CTA shape across the site; secondary actions live as charcoal pills (`{components.button-secondary}`) or text links.
+- Oversized **gradient spotlight cards** (violet, magenta, orange, coral) act as showcase tiles inside the dark grid; they are individual cards, not section backgrounds.
+- Inter Variable with bespoke OpenType character variants (`cv01/05/09/11`, `ss03/ss07`, `dlig`) used everywhere body type appears — the typographic voice is unmistakable.
+- Border radius scale runs from 4px utility chips up to 100px pills and full circles, with 15–20px the default for cards and 30px for atmospheric gradient cards.
+- A single chromatic accent `{colors.accent-blue}` reserved for hyperlinks, focus, and selection — never decorative.
 
-## 2. Dokumen dan Sumber Acuan
+## Colors
 
-Urutan acuan jika terdapat perbedaan:
+> Source pages: framer.com (home), /ai/, /startups/, /marketplace/templates/nudge/, /gallery/a16z-speedrun-×-tonik, /pricing.
 
-1. `PRD_Pencatatan_Keuangan_AI_Agent.docx` untuk kebutuhan produk dan ruang lingkup fitur.
-2. `CLAUDE.md` untuk arsitektur, keamanan, peran, dan aturan kerja implementasi.
-3. `spesifikasi-api-catatan-keuangan.md` untuk kontrak data API.
-4. `ERD_Pencatatan_Keuangan_AI_Agent.docx` / `ERD_Pencatatan_Keuangan_AI_Agent.mmd` untuk struktur data.
-5. `DESIGN.md` ini untuk sistem visual dan pola UI.
-6. `acru_financial_dashboard (1).html` untuk referensi visual dashboard.
+### Brand & Accent
+- **Pure White** ({colors.primary}): The brand primary surface. Every primary CTA pill, every display headline, every body line on canvas.
+- **Sky Blue** ({colors.accent-blue}): The single chromatic accent. Hyperlinks, focused-input rings, and a few selection states. Never used for backgrounds or as a brand fill.
 
-Kebutuhan produk, privasi, dan keamanan selalu mengalahkan kemiripan visual. Jika elemen referensi bertentangan dengan produk, pertahankan gaya visualnya dan ubah fungsi atau kontennya.
+### Surface
+- **Canvas** ({colors.canvas}): Default page background — near-black with a faint warmth. Footer, pricing, hero, and FAQ all sit on it.
+- **Surface 1** ({colors.surface-1}): One step above canvas — pricing cards, secondary buttons, mockup tiles.
+- **Surface 2** ({colors.surface-2}): Two steps above — featured pricing card, hero pill backdrop, selected pricing tab.
+- **Hairline** ({colors.hairline}): 1px borders on input groups, comparison-table dividers.
+- **Hairline Soft** ({colors.hairline-soft}): Subtler dividers — between FAQ rows and footer column rules.
+- **Inverse Canvas** ({colors.inverse-canvas}): Pure white — used as the surface of light-on-dark pill CTAs and a small set of light-mode template thumbnails embedded in the showcase grid.
 
-## 3. Arah Visual
+### Text
+- **Ink** ({colors.ink}): All headline and emphasized body type — pure white.
+- **Ink Muted** ({colors.ink-muted}): Secondary type — gray (#999999) used for meta info, footer columns, comparison-row labels, deselected pricing tabs. Hierarchy on the dark canvas is carried by ink → ink-muted contrast, not by weight changes.
 
-**Karakter:** minimal, terang, ringan, rapi, ramah, berbasis kartu, dengan aksen hijau-lime dan aksen hangat yang hemat.
+### Semantic
+- **Success Green** ({colors.semantic-success}): Pricing comparison-table checkmarks. Glyph fill, not surface.
 
-Ciri utama dari referensi HTML:
+### Brand Gradient (signature)
+- **Gradient Magenta** ({colors.gradient-magenta}): Spotlight card variant.
+- **Gradient Violet** ({colors.gradient-violet}): Spotlight card variant — most common.
+- **Gradient Orange** ({colors.gradient-orange}): Spotlight card variant — sunset wash.
+- **Gradient Coral** ({colors.gradient-coral}): Spotlight card variant — coral/pink.
 
-- Sidebar putih yang terpisah dari area kerja.
-- Area konten utama menggunakan latar abu-abu sangat muda dengan sudut membulat besar.
-- Kartu putih dengan sudut membulat, border tipis, dan bayangan lembut.
-- Tata letak dashboard bergaya *bento grid* dengan ukuran kartu bervariasi sesuai prioritas informasi.
-- Tipografi sans-serif bersih; judul dan angka penting lebih tegas daripada label.
-- Grafik memakai hijau, lime/kuning, dan oranye, dengan grid tipis dan legenda ringkas.
-- Ikon sederhana dengan ukuran konsisten.
-- Interaksi hover/focus yang halus, tidak berlebihan.
+These four sit as oversized atmospheric tiles inside otherwise monochrome card grids — a dark canvas with one or two glowing spotlight cards is a recurring page signature.
 
-Hindari tampilan dashboard admin generik, gradien berlebihan, efek glassmorphism yang dominan, terlalu banyak warna aksen, animasi dekoratif yang mengganggu, dan kartu dengan border/shadow tebal.
+## Typography
 
-## 4. Design Tokens
+### Font Family
 
-Gunakan token terpusat melalui CSS variables atau konfigurasi Tailwind. Nilai berikut berasal dari atau diselaraskan dengan HTML referensi; token boleh disempurnakan selama implementasi, tetapi jangan membuat palet baru per halaman.
+- **GT Walsheim Framer Medium** / **GT Walsheim Medium** — Framer's display typeface. Geometric, slightly humanist, very confident at large sizes with extreme negative tracking. Fallbacks: `GT Walsheim Medium Placeholder` system font.
+- **Inter Variable** — System body typeface. Used with extensive OpenType character variants: `cv01` (alternate "1"), `cv05` (alternate "g"), `cv09` (alternate "i" / "l"), `cv11` (alternate "0"), `ss03` / `ss07` stylistic sets, `dlig` discretionary ligatures, and `tnum` for numerics in tabular contexts. The result is a body voice that feels bespoke without commissioning a custom face.
+- **Inter** — Used selectively for `{typography.headline}` (the 22px / 20px tier). The non-variable cut catches small tracking targets that the variable file rounds.
 
-### 4.1 Warna
+### Hierarchy
 
-| Token | Nilai | Penggunaan |
+| Token | Size | Weight | Line Height | Letter Spacing | Use |
+|---|---|---|---|---|---|
+| `{typography.display-xxl}` | 110px | 500 | 0.85 | -5.5px | Largest hero headline (home, AI page) |
+| `{typography.display-xl}` | 85px | 500 | 0.95 | -4.25px | Section opener headlines |
+| `{typography.display-lg}` | 62px | 500 | 1.00 | -3.1px | Sub-section openers |
+| `{typography.display-md}` | 32px | 500 | 1.13 | -1.0px | Card titles, smaller display |
+| `{typography.headline}` | 22px | 700 | 1.20 | -0.8px | Pricing tier headlines, FAQ category titles |
+| `{typography.subhead}` | 24px | 400 | 1.30 | -0.01px | Lead body next to display headlines |
+| `{typography.body-lg}` | 18px | 400 | 1.30 | -0.18px | Hero subhead, lead paragraphs |
+| `{typography.body}` | 15px | 400 | 1.30 | -0.15px | Default body, card descriptions |
+| `{typography.body-sm}` | 14px | 500 | 1.40 | -0.14px | Pricing comparison rows, dense data |
+| `{typography.caption}` | 13px | 500 | 1.20 | -0.13px | Eyebrows, footer columns, meta |
+| `{typography.micro}` | 12px | 400 | 1.20 | -0.12px | Disclaimer, footnote |
+| `{typography.button}` | 14px | 500 | 1.0 | -0.14px | Pill buttons |
+
+### Principles
+
+- **Letter-spacing scales with size, hard.** Display-xxl pulls -5.5px (5% of size); body sticks to about -1% (-0.15px on 15px). The result: posters at the top, comfortable reading at body.
+- **OpenType character variants are the brand voice.** Switching off `cv11`, `ss03`, etc. visibly changes the body voice — the brand depends on them.
+- **Weight stays in a narrow band.** Display sits at 500, body at 400, body-sm/caption at 500. Hierarchy is carried by size + tracking, not by 700/900 ramps.
+- **Tight line-heights everywhere.** Even body runs at 1.30 — Framer's editorial tone is denser than typical SaaS marketing.
+
+### Note on Font Substitutes
+
+If implementing without GT Walsheim Medium, suitable open-source substitutes include **Mona Sans**, **Geist**, or **Inter** at weight 600–700 with manually tightened tracking. Mona Sans's hairline weights at 100–300 are particularly close to Framer's cleaner section openers. Inter Variable is open-source — keep it as-is and preserve the documented OpenType variants.
+
+## Layout
+
+### Spacing System
+
+- **Base unit**: 5px (Framer uses non-standard 5/10/15/20/30 increments rather than the more common 4/8/16/24).
+- **Tokens (front matter)**: `{spacing.hair}` 1px · `{spacing.xxs}` 4px · `{spacing.xs}` 8px · `{spacing.sm}` 12px · `{spacing.md}` 15px · `{spacing.lg}` 20px · `{spacing.xl}` 30px · `{spacing.xxl}` 40px · `{spacing.section}` 96px.
+- Card interior padding: `{spacing.lg}` 20px on pricing cards; `{spacing.xl}` 30px on gradient spotlight cards.
+- Pill button padding: 10px vertical · 15px horizontal — `{components.button-primary}`.
+- Section padding (vertical): roughly `{spacing.section}` 96px on home; tighter (~64px) on pricing comparison.
+
+### Grid & Container
+
+- Max content width sits around the 1199px breakpoint, with side gutters that scale toward `{spacing.xl}` on desktop.
+- Card grids on the home gallery use 2-up at desktop, collapsing to 1-up below 810px.
+- Pricing tier grid is 4-up across the documented breakpoints; comparison table beneath it uses fixed-width left column with horizontally scrolling tier columns at narrow widths.
+
+### Whitespace Philosophy
+
+The dark canvas IS the whitespace. Where lighter brands lean on white air to separate sections, Framer leans on long stretches of black with a single oversized statement floating in the middle. Sections separate by mode change: a band of charcoal cards, then a band of black with a gradient spotlight, then back to charcoal — like cuts in a dark film.
+
+## Elevation & Depth
+
+| Level | Treatment | Use |
 |---|---|---|
-| `--color-canvas` | `#F2F3F5` | Latar area kerja utama |
-| `--color-surface` | `#FFFFFF` | Kartu, sidebar, header, modal |
-| `--color-text` | `#111827` | Teks utama / gray-900 |
-| `--color-text-secondary` | `#4B5563` | Teks sekunder / gray-600 |
-| `--color-muted` | `#9CA3AF` | Label, helper text, metadata |
-| `--color-border` | `#E5E7EB` | Border, separator, grid grafik |
-| `--color-brand` | `#8CE533` | Aksen brand utama |
-| `--color-brand-strong` | `#8FD93B` | Pemasukan / progress positif |
-| `--color-brand-soft` | `#B9EE7B` | Aksen sekunder lembut |
-| `--color-lime` | `#E2F542` | Tabungan / sorotan grafik |
-| `--color-orange` | `#FDB65E` | Pengeluaran / aksen hangat |
-| `--color-orange-soft` | `#FED08E` | Variasi aksen oranye |
-| `--color-neutral-soft` | `#F7F8FA` | Latar kontrol dan elemen sekunder |
-| `--color-neutral-track` | `#ECEEF1` | Track progress dan elemen grafik pasif |
-| `--color-success` | `#65A30D` | Status sukses dan indikator positif |
-| `--color-warning` | `#D97706` | Peringatan |
-| `--color-danger` | `#DC2626` | Error, penghapusan, kondisi berbahaya |
-| `--color-info` | `#2563EB` | Informasi bila dibutuhkan |
-
-**Aturan penggunaan warna:**
-
-- Hijau menunjukkan pemasukan, progres baik, atau aksi utama yang positif.
-- Oranye dapat mewakili pengeluaran atau peringatan yang tidak kritis. Jangan memakai warna oranye sebagai satu-satunya pembeda status penting.
-- Merah hanya untuk error, tindakan destruktif, atau kondisi berbahaya; bukan sebagai aksen dekoratif.
-- Jangan mengandalkan warna saja untuk menjelaskan status. Sertakan label, ikon, atau teks.
-- Pastikan kontras teks dan komponen interaktif memadai.
+| 0 (flat) | No shadow, no border | Default for canvas-mounted display type, FAQ rows, footer |
+| 1 (charcoal) | `{colors.surface-1}` lift on canvas | Pricing cards, mockup tiles, secondary buttons |
+| 2 (light-edge) | `rgba(255,255,255,0.10)` 0.5px top edge + `rgba(0,0,0,0.25)` 0px 10px 30px drop | Floating product cards, modal cards |
+| 3 (selected) | `rgba(0,153,255,0.15)` 0px 0px 0px 1px ring | Focused inputs, selected option |
 
-### 4.2 Tipografi
+Four shadow signatures recur across the homepage: a 1px subtle drop, a translucent blue ring, a thick near-black 2px outline (used as the active-element marker on sub-nav), and the layered light-edge + drop-shadow used for floating cards.
 
-Referensi menggunakan **Inter** untuk teks antarmuka dan **Plus Jakarta Sans** untuk judul/display.
+### Decorative Depth
 
-- Font UI/body: `Inter`, fallback `ui-sans-serif, system-ui, sans-serif`.
-- Font display/heading: `Plus Jakarta Sans`, fallback `Inter, sans-serif`.
-- Judul halaman desktop: sekitar 24–30 px, tebal 700–800.
-- Judul kartu: sekitar 14–16 px, tebal 600–700.
-- Angka KPI utama: sekitar 24–32 px, tebal 700–800; sesuaikan dengan prioritas.
-- Body: 13–14 px sebagai ukuran ringkas default; gunakan ukuran lebih besar bila konteks membutuhkan keterbacaan.
-- Label/helper: 11–12 px hanya untuk informasi sekunder. Jangan gunakan ukuran kecil untuk instruksi penting, input utama, atau teks panjang.
-- Gunakan line-height yang cukup dan jangan membuat semua teks tampak sama tebal.
+- **Gradient spotlight cards** are the dominant depth device — color saturation against black canvas substitutes for shadow-driven elevation.
+- **Layered product mockups** (browser frames containing live Framer-built sites) sit inside `{colors.surface-1}` cards with the level-2 light-edge treatment.
+- **Subtle blue ring (focus / selected)** is the only chromatic depth signal — used to mark the active state of input groups and pricing tier toggles without changing the underlying surface.
 
-Jika Google Fonts eksternal tidak tersedia atau tidak diinginkan, gunakan fallback system fonts tanpa merusak layout.
+## Shapes
 
-### 4.3 Radius, Spacing, dan Elevation
+### Border Radius Scale
 
-| Token/pola | Panduan |
-|---|---|
-| Radius kontrol | 10–12 px |
-| Radius kartu | 18–22 px |
-| Radius kontainer utama | 22–26 px |
-| Padding kartu | 16–20 px, lebih besar untuk visualisasi utama |
-| Jarak antar elemen | kelipatan 4 px; utamakan 8, 12, 16, 20, 24 px |
-| Border | 1 px solid `#E5E7EB` atau versi transparan yang halus |
-| Shadow kartu | sangat halus, setara `0 2px 10px -2px rgba(0,0,0,.02), 0 1px 3px -1px rgba(0,0,0,.02)` |
-| Shadow overlay | lebih jelas tetapi tetap lembut, untuk dropdown/modal/popover saja |
-
-Utamakan pemisahan dengan ruang kosong, warna latar, dan border tipis daripada bayangan gelap.
-
-### 4.4 Pola Garis Diagonal
-
-Referensi memakai pola diagonal/striped pada batang grafik dan progress tertentu. Pola ini boleh digunakan secara terbatas sebagai aksen visual untuk:
+Framer's extracted radius set is unusually granular (1px, 4px, 5px, 6px, 8px, 10px, 12px, 15px, 20px, 30px, 40px, 100px). The named scale below picks the levels the marketing surface actually consumes.
 
-- Progress anggaran atau target.
-- Batang grafik terpilih.
-- Ilustrasi kecil pada kartu insight.
+| Token | Value | Use |
+|---|---|---|
+| `{rounded.xs}` | 4px | Small chip / utility radius |
+| `{rounded.sm}` | 6px | Inline tag, badge |
+| `{rounded.md}` | 10px | Form input, list item |
+| `{rounded.lg}` | 15px | Template card thumbnails |
+| `{rounded.xl}` | 20px | Pricing cards, mockup tiles |
+| `{rounded.xxl}` | 30px | Gradient spotlight cards, oversized panels |
+| `{rounded.pill}` | 100px | All primary text CTAs |
+| `{rounded.full}` | 9999px | Circular icon buttons, avatar circles |
 
-Jangan gunakan pola striped pada seluruh kartu, latar halaman, teks, atau kontrol input. Data harus tetap terbaca tanpa pola tersebut.
+### Photography & Illustration Geometry
 
-## 5. Layout Aplikasi
+- Embedded site mockups (browser-chromed previews of Framer-built sites) sit in `{rounded.xl}` 20px tiles with `{spacing.md}` 15px interior padding.
+- Gradient spotlight cards use `{rounded.xxl}` 30px corners — softer than the 20px content cards by design, to make them feel like atmospheric panels rather than tighter UI.
+- Icon glyphs and sub-nav glyphs render in `{rounded.full}` circles at 32–40px sizes.
 
-### 5.1 Struktur Dasar Halaman Setelah Login
+## Components
 
-- Sidebar navigasi di sisi kiri pada desktop.
-- Area kerja utama mengisi ruang tersisa.
-- Header halaman di bagian atas area kerja untuk pencarian bila relevan, notifikasi, profil pengguna, dan tindakan kontekstual.
-- Area konten dengan latar `canvas`, kartu putih, dan jarak konsisten.
-- Pada layar kecil, sidebar menjadi drawer/off-canvas yang dapat dibuka dan ditutup.
+### Buttons
 
-Sidebar referensi desktop berada di kisaran 230–250 px. Angka ini adalah panduan, bukan ukuran wajib. Jangan biarkan sidebar mengurangi ruang konten secara berlebihan pada laptop kecil.
+**`button-primary`** — White pill on dark canvas. The primary CTA across home, pricing, AI, and gallery pages.
+- Background `{colors.primary}`, text `{colors.on-primary}`, type `{typography.button}`, padding 10px 15px, rounded `{rounded.pill}`.
+- Pressed state lives in `button-primary-pressed` (the live site uses a transform-scale shrink rather than a darkened fill).
 
-### 5.2 Navigasi Pengguna
+**`button-secondary`** — Charcoal pill. Used for secondary navigation actions ("Sign in", "Talk to sales") and as the visual counterpart to the primary pill.
+- Background `{colors.surface-1}`, text `{colors.ink}`, type `{typography.button}`, padding 10px 15px, rounded `{rounded.pill}`.
 
-Menu harus mengikuti ruang lingkup produk, bukan menu ACRU. Gunakan label berbahasa Indonesia:
+**`button-translucent`** — Translucent / lifted secondary used on top of busy backgrounds (gallery hero, gradient cards).
+- Background `{colors.surface-2}`, text `{colors.ink}`, type `{typography.button}`, rounded `{rounded.xxl}`, padding 8px 14px.
 
-1. Dashboard
-2. Transaksi
-3. Akun & Dompet
-4. Kategori
-5. Laporan Keuangan
-6. Anggaran & Target
-7. Transaksi Berulang
-8. AI Agent & API Key
-9. Notifikasi
-10. Pengaturan
+**`button-icon-circular`** — 40px circle for inline icon actions (carousel arrows, social links).
+- Background `{colors.surface-1}`, text `{colors.ink}`, rounded `{rounded.full}`, size 40px.
 
-Menu dapat dikelompokkan menjadi bagian utama dan bagian pengaturan bila membantu pemindaian. Hindari membuat submenu bertingkat terlalu dalam. Jika submenu digunakan, tampilkan status terbuka, indikator arah, indentasi, dan garis penghubung halus seperti inspirasi pada referensi.
+### Pricing Tabs
 
-### 5.3 Navigasi Admin
+**`pricing-tab-default`** + **`pricing-tab-selected`** — The pill-toggle that switches between Basic / Pro / Business / Enterprise on `/pricing`.
+- Default: `{colors.canvas}` background, `{colors.ink-muted}` text, rounded `{rounded.pill}`.
+- Selected: `{colors.surface-2}` background, `{colors.ink}` text — selected = lift, not color. Surface depth communicates "active" without needing a chromatic fill.
 
-Gunakan shell visual yang konsisten, tetapi menu dan isi halaman khusus admin:
+### Inputs & Forms
 
-1. Admin Dashboard
-2. Manajemen Pengguna
-3. Monitoring API
-4. Template Laporan PDF
-5. Audit Log
-6. Pengaturan Website
+**`text-input`** + **`text-input-focused`** — Form fields on `/pricing` (seat-count, currency switcher) and the in-product preview surfaces.
+- Background `{colors.surface-1}`, text `{colors.ink}`, type `{typography.body}`, rounded `{rounded.md}`, padding 10px 14px.
+- Focused state retains the same surface; the focus ring is the level-3 blue-tinted shadow `rgba(0,153,255,0.15)` 0 0 0 1px.
 
-Dashboard admin menampilkan metrik operasional dan data agregat. Jangan menampilkan rincian transaksi pribadi pengguna secara default.
+### Cards & Containers
 
-### 5.4 Header
+**`pricing-card`** — Each tier on `/pricing`.
+- Background `{colors.surface-1}`, text `{colors.ink}`, type `{typography.body}`, rounded `{rounded.xl}`, padding 24px.
 
-Header dapat memuat:
+**`pricing-card-featured`** — The Pro tier (visually emphasized).
+- Background `{colors.surface-2}`, otherwise identical structure. The lift is one surface step up — no chromatic outline.
 
-- Breadcrumb atau judul/konteks halaman jika dibutuhkan.
-- Pencarian global hanya bila pencarian benar-benar didukung.
-- Notifikasi.
-- Akses pengaturan/profil.
-- Satu tindakan utama yang relevan untuk halaman, misalnya **Tambah transaksi** pada halaman transaksi.
+**`template-card`** — Thumbnail tile in the home "Built with Framer" gallery and `/marketplace`.
+- Background `{colors.surface-1}`, text `{colors.ink}`, type `{typography.body-sm}`, rounded `{rounded.lg}`, padding 12px.
 
-Jangan menampilkan tombol generik seperti “Add widget” dari referensi jika fitur tersebut tidak menjadi kebutuhan produk. Header harus ringkas dan tidak menampilkan semua kontrol di semua halaman.
+**`product-mockup-tile`** — Larger tile that frames a live product UI mock (Framer canvas, Workshop video, AI translate panel).
+- Background `{colors.surface-1}`, text `{colors.ink}`, type `{typography.body-sm}`, rounded `{rounded.xl}`, padding 16px.
 
-## 6. Pola Dashboard Pengguna
+### Gradient Spotlight Cards (signature)
 
-Dashboard merupakan halaman ringkasan, bukan pengganti halaman transaksi, laporan, atau anggaran. Gunakan prinsip *bento grid* yang terinspirasi referensi, dengan konten yang sesuai aplikasi ini.
+The defining decorative surface of Framer's marketing — oversized atmospheric tiles dropped into otherwise monochrome card grids. Variants:
 
-### 6.1 Susunan yang Direkomendasikan
+**`gradient-spotlight-card`** — violet ground (most common).
+- Background `{colors.gradient-violet}`, text `{colors.ink}`, type `{typography.subhead}`, rounded `{rounded.xl}`, padding 32px. (The on-site card often pushes to `{rounded.xxl}` 30px when it spans a wider tile.)
 
-1. **Header dashboard** — sapaan atau judul, rentang periode aktif, dan tombol `Tambah transaksi`.
-2. **Ringkasan KPI** — saldo bersih/total saldo, pemasukan periode, pengeluaran periode, dan arus kas bersih. Pilih empat metrik yang paling berguna berdasarkan data yang tersedia; jangan menampilkan metrik palsu atau belum dapat dihitung.
-3. **Grafik arus kas** — pemasukan dan pengeluaran per hari/minggu/bulan, dengan filter periode.
-4. **Anggaran dan progres** — anggaran terpakai, sisa anggaran, serta target tabungan jika data tersebut telah diimplementasikan.
-5. **Pengeluaran berdasarkan kategori** — komposisi kategori dengan legenda dan nominal/persentase yang mudah dibaca.
-6. **Transaksi terbaru** — daftar ringkas dengan tanggal, deskripsi, kategori, akun, dan nominal; tautan ke riwayat lengkap.
-7. **Insight atau pengingat** — hanya jika didukung data yang benar. Hindari saran finansial yang terdengar pasti bila hanya berbasis aturan sederhana.
+**`gradient-spotlight-card-magenta`** — magenta-pink ground.
+- Background `{colors.gradient-magenta}`, otherwise identical.
 
-Urutan dan ukuran kartu boleh berubah mengikuti lebar layar dan prioritas informasi. Pada layar lebar, grafik utama dapat mengambil porsi terbesar, dengan ringkasan dan transaksi terbaru di kolom pendamping. Pada layar kecil, susun kartu dalam satu kolom dengan KPI yang tetap mudah dipindai.
+**`gradient-spotlight-card-orange`** — sunset-orange wash.
+- Background `{colors.gradient-orange}`, otherwise identical.
 
-### 6.2 KPI dan Nominal
+(Coral pink follows the same shape with `{colors.gradient-coral}`.)
 
-- Default locale: `id-ID`, mata uang `IDR`/Rupiah, sesuai PRD.
-- Format nominal secara konsisten, misalnya `Rp1.250.000` atau format locale standar yang dipilih proyek.
-- Jangan gunakan nilai mata uang USD dari contoh HTML.
-- Nilai negatif, pemasukan, pengeluaran, dan saldo harus dibedakan secara konsisten melalui label dan tanda; jangan hanya mengandalkan warna.
-- Perubahan persentase harus memiliki pembanding periode yang jelas. Jangan tampilkan angka tren jika data pembanding tidak tersedia.
-- Tangani kondisi nol, data kosong, dan nilai sangat besar tanpa overflow.
+### Comparison & FAQ
 
-### 6.3 Grafik dan Visualisasi
+**`feature-row`** + **`comparison-row`** — Single rows inside the pricing comparison table.
+- `feature-row`: `{colors.canvas}` background, `{colors.ink}` text. Header rows.
+- `comparison-row`: `{colors.canvas}` background, `{colors.ink-muted}` text. Data rows with `{typography.body-sm}` and 1px `{colors.hairline-soft}` underlines.
 
-- Gunakan library chart yang kompatibel dengan Next.js dan sudah disetujui dalam proyek.
-- Grafik harus menggunakan data API aktual, bukan angka statis dari referensi.
-- Sediakan judul, periode, legenda, label/tooltip, dan keadaan kosong.
-- Gridline tipis dan label sumbu sekunder menggunakan warna muted.
-- Gunakan hijau untuk pemasukan, oranye untuk pengeluaran, dan lime/warna netral untuk tabungan atau target jika relevan.
-- Jangan menampilkan tooltip permanen yang menutupi data; tooltip muncul saat hover/focus atau interaksi yang sesuai.
-- Berikan ringkasan tekstual atau tabel pendamping bila grafik penting sulit diakses.
-- Jangan menyimpulkan kesehatan keuangan dari formula yang belum didefinisikan. Jika ada skor, dokumentasikan formula dan tampilkan penjelasan.
+**`faq-row`** — Each accordion line in the pricing-page FAQ.
+- Background `{colors.canvas}`, text `{colors.ink}`, type `{typography.body}`, rounded `{rounded.md}`, padding 24px.
 
-### 6.4 Progress Anggaran dan Target
+### Navigation
 
-- Tampilkan nilai terpakai, batas/target, persentase, dan sisa jika tersedia.
-- Progress bar memiliki track netral dan fill yang kontras.
-- Ketika anggaran mendekati atau melampaui batas, sertakan label status selain warna.
-- Hindari estimasi waktu mencapai target kecuali perhitungannya benar-benar tersedia dan asumsi dijelaskan.
+**`top-nav`** — Sticky bar on `{colors.canvas}` with the Framer wordmark left, primary nav links centered, and a `button-secondary` ("Sign in") + `button-primary` ("Get started for free") pair right.
+- Background `{colors.canvas}`, text `{colors.ink}`, type `{typography.body-sm}`, height 56px.
+- Mobile: collapses primary links into a hamburger; the two pill CTAs collapse into a single primary pill on the bar.
 
-### 6.5 Transaksi Terbaru
+### Footer
 
-Gunakan baris ringkas dengan hirarki: deskripsi transaksi, kategori/akun dan tanggal sebagai metadata, nominal sebagai informasi yang mudah ditemukan. Pada layar kecil, susun nominal dan deskripsi agar tidak saling bertabrakan. Sediakan empty state dengan tindakan yang jelas ketika belum ada transaksi.
+**`footer`** — Dense link grid on `{colors.canvas}` with the Framer wordmark left and 5–6 columns of caption-sized links.
+- Background `{colors.canvas}`, text `{colors.ink-muted}`, type `{typography.caption}`, padding 64px 32px.
 
-## 7. Pola Halaman Lain
+## Do's and Don'ts
 
-Konsistensi berarti menggunakan token dan komponen yang sama, bukan mengulang layout dashboard.
+### Do
 
-### Transaksi
+- Reserve `{colors.primary}` (white) and `{colors.canvas}` (near-black) as the system's two anchor surfaces. Every band of the page chooses one or the other.
+- Push display-size letter-spacing aggressively negative — `{typography.display-xxl}` at -5.5px is the brand signature, not a stylistic accident.
+- Use `{colors.accent-blue}` only for hyperlinks, focus rings, and selected indicators. Never as a background or button fill.
+- Drop one or two `gradient-spotlight-card` variants into a card grid; they are the brand's atmosphere device. Don't overdo it — three or more in the same viewport reads as a moodboard, not a system.
+- Compose every CTA as a pill (`{rounded.pill}`); secondary actions live as charcoal pills, never as bordered ghost buttons.
+- Keep body type Inter Variable with character variants `cv01`, `cv05`, `cv09`, `cv11`, `ss03`, `ss07` enabled — the brand voice depends on them.
+- Use surface lift (canvas → surface-1 → surface-2) to mark hierarchy on dark, not opacity changes on white type.
 
-- Prioritaskan daftar/tabel, filter periode, jenis transaksi, akun, kategori, dan pencarian.
-- Tombol `Tambah transaksi` terlihat jelas.
-- Form tambah/edit menggunakan label eksplisit, validasi inline, dan pesan error yang spesifik.
-- Pertimbangkan tampilan tabel pada desktop dan daftar/kartu ringkas pada mobile.
-- Konfirmasi sebelum tindakan destruktif.
+### Don't
 
-### Akun & Dompet
+- Don't ship a light-mode marketing page. Framer's identity is dark.
+- Don't introduce mid-tone gray text outside `{colors.ink-muted}`. The hierarchy is binary: `ink` or `ink-muted`.
+- Don't use `{colors.accent-blue}` as a brand fill (e.g., a blue CTA pill). The blue is a signal color, not a surface.
+- Don't square off CTAs. Pill (`{rounded.pill}`) or full circle is the brand vocabulary.
+- Don't reduce the negative letter-spacing on display sizes "for accessibility". The compression is intrinsic to the brand voice; reduce the SIZE if needed, but keep the percentage.
+- Don't apply gradient backgrounds to whole sections. Gradients are CARDS, not section grounds.
+- Don't combine more than one chromatic accent. The palette is monochrome plus one blue plus the gradient family — not "blue, green, and red".
 
-- Tampilkan saldo akun, nama, jenis akun, dan metadata yang relevan.
-- Jangan menampilkan produk kartu kredit/debit atau fitur pembayaran seperti pada HTML referensi kecuali benar-benar masuk scope.
+## Responsive Behavior
 
-### Kategori
+### Breakpoints
 
-- Gunakan daftar kategori yang mudah dipindai dengan nama, tipe, ikon/warna opsional, dan jumlah transaksi jika relevan.
-- Bedakan kategori pemasukan dan pengeluaran secara jelas.
+| Name | Width | Key Changes |
+|---|---|---|
+| Desktop | 1199px | Default desktop layout |
+| Tablet | 810px | Card grids collapse 4-up → 2-up; nav becomes hamburger |
+| Mobile-Lg | 809px | Pricing comparison table becomes per-tier accordion |
+| Mobile-XS | 98px | Smallest documented breakpoint — single-column everything |
 
-### Laporan Keuangan
+### Touch Targets
 
-- Sediakan pilihan mingguan, bulanan, dan rentang tanggal khusus sesuai PRD.
-- Tampilkan ringkasan dan pratinjau sebelum ekspor PDF.
-- Tombol unduh dan status proses harus jelas. Jangan meniru grafik dashboard secara paksa jika laporan membutuhkan layout dokumen yang lebih formal.
+- Pill buttons (`button-primary`, `button-secondary`) maintain a minimum 44px tap height across all viewports — combine `{typography.button}` 14px line-height with the documented 10px vertical padding.
+- Circular icon buttons (`button-icon-circular`) are 40px on desktop and grow to 44px on touch viewports.
+- Pricing-tab pills hold ≥40px tap height; below 810px they may collapse into a horizontal-scroll row instead of stacking.
 
-### Anggaran & Target
+### Collapsing Strategy
 
-- Gunakan kartu progres, nilai target, periode, nominal yang telah digunakan/ditabung, dan status.
-- Buat form tambah/edit yang fokus pada tugas, bukan dashboard mini yang padat.
+- **Nav**: horizontal nav with a centered link group + right-anchored pill pair collapses to a hamburger overlay below 810px. The `button-primary` stays visible on the bar.
+- **Card grids**: the gallery and template-card grids go 2-up on desktop → 1-up on mobile. Gradient spotlight cards retain `{rounded.xxl}` corners at every viewport — they don't bleed.
+- **Pricing comparison table**: collapses into per-tier accordions below 810px to avoid horizontal scroll.
+- **Display type**: `{typography.display-xxl}` 110px scales down toward `{typography.display-lg}` 62px on tablet and `{typography.display-md}` 32px on mobile, preserving the percentage-negative letter-spacing.
 
-### Transaksi Berulang
+### Image Behavior
 
-- Tampilkan jadwal, nominal, akun/kategori, tanggal berikutnya, dan status aktif/nonaktif.
-- Sediakan kontrol yang jelas untuk jeda, aktifkan kembali, ubah, dan hapus.
+- Embedded product mockups (browser frames containing live Framer-built sites) maintain their aspect ratio and never crop.
+- Gradient spotlight cards keep their gradient orientations across breakpoints — the gradient direction is part of the brand spec.
 
-### AI Agent & API Key
+## Iteration Guide
 
-- Halaman ini berorientasi pada keamanan dan pengaturan, bukan visualisasi finansial.
-- Jelaskan status token, scope/izin, tanggal dibuat, penggunaan terakhir bila tersedia, dan tindakan revoke/rotasi.
-- Token rahasia hanya ditampilkan saat dibuat/dirotasi sesuai aturan keamanan; sediakan tombol salin dengan umpan balik yang jelas.
-- Jangan pernah menaruh token rahasia pada URL, log, atau contoh UI yang dapat diakses publik.
-- Gunakan blok kode atau contoh request yang rapi, dengan nilai token berupa placeholder.
+1. Focus on ONE component at a time and reference it by its `components:` token name (e.g., `{components.button-primary}`, `{components.gradient-spotlight-card}`).
+2. When introducing a new section on the dark canvas, decide first which surface lift it lives on — `{colors.canvas}` for hero/FAQ, `{colors.surface-1}` for cards, `{colors.surface-2}` for featured cards. The depth choice is the most consequential decision.
+3. Default body to `{typography.body}` with all the documented OpenType variants; reach for `{typography.subhead}` only inside spotlight cards.
+4. Run `npx @google/design.md lint DESIGN.md` after edits — `broken-ref`, `contrast-ratio`, and `orphaned-tokens` warnings flag issues automatically.
+5. Add new variants as separate component entries (`-pressed`, `-featured`, `-selected`) — do not bury them in prose.
+6. Treat `{colors.accent-blue}` as a single-shot signal color: hyperlinks, focus, and selection — that's it. If you find yourself reaching for a second blue, the brand is drifting.
+7. Gradient spotlight cards are scarce by design. One or two per long page is the spec; three is a moodboard.
 
-### Notifikasi dan Pengaturan
+## Known Gaps
 
-- Gunakan daftar notifikasi dengan status dibaca/belum dibaca dan filter sederhana bila diperlukan.
-- Pengaturan dibagi ke dalam kelompok yang jelas, misalnya profil, preferensi, keamanan, dan notifikasi.
-
-### Admin Dashboard
-
-- Gunakan KPI agregat seperti jumlah pengguna, pengguna aktif, jumlah request API, error rate, dan kesehatan layanan jika metrik tersedia.
-- Jangan tampilkan transaksi atau nominal pribadi pengguna secara bebas.
-- Monitoring API fokus pada performa, status, error, dan volume request; sembunyikan token mentah dan data sensitif.
-
-### Template PDF dan Audit Log
-
-- Template PDF membutuhkan editor/pratinjau yang berorientasi pada dokumen.
-- Audit log menggunakan tabel dengan waktu, aktor, tindakan, objek, hasil, dan metadata aman. Hindari menampilkan secret atau konten transaksi sensitif secara default.
-
-## 8. Komponen UI yang Perlu Distandarkan
-
-Buat komponen reusable sesuai pola proyek, tanpa membuat abstraksi berlebihan:
-
-- `AppShell`, `Sidebar`, `MobileNavigation`, `PageHeader`.
-- `Card`, `SectionHeader`, `KpiCard`.
-- `Button` dengan varian primary, secondary, ghost, danger, dan ukuran konsisten.
-- `Input`, `Select`, `DateRangePicker`, `SearchInput`, `FormField`.
-- `Badge`/status indicator dengan teks.
-- `ProgressBar`.
-- `DataTable` atau `ResponsiveList`.
-- `EmptyState`, `LoadingSkeleton`, `ErrorState`, `Toast`.
-- `ConfirmDialog` untuk aksi destruktif.
-- Komponen grafik dan tooltip yang aksesibel.
-
-Jangan membuat komponen terpisah untuk elemen yang hanya berbeda satu class kecuali reuse atau perilaku memang membutuhkannya. Ikuti konvensi penamaan yang sudah ada di repositori.
-
-## 9. Ikon dan Ilustrasi
-
-HTML referensi menggunakan Phosphor Icons. Gunakan satu pustaka ikon yang konsisten. Jika proyek telah menetapkan pustaka, pertahankan pustaka tersebut daripada menambahkan pustaka kedua. Jika belum ada, Phosphor dapat digunakan sebagai pilihan yang paling dekat dengan referensi.
-
-- Ukuran ikon navigasi umumnya 18–20 px.
-- Ikon kontrol kecil sekitar 14–16 px.
-- Ikon harus punya makna dan label aksesibel jika berdiri sendiri.
-- Hindari emoji sebagai pengganti ikon utama pada UI produksi, kecuali memang bagian dari gaya yang disengaja.
-- Avatar/foto hanya ditampilkan jika data pengguna tersedia dan memang berguna.
-
-## 10. Responsivitas
-
-Gunakan pendekatan *mobile-first* dan breakpoint Tailwind yang konsisten dengan proyek.
-
-- **Mobile:** sidebar menjadi drawer; satu kolom; kontrol penting tetap terlihat; tabel dapat berubah menjadi daftar; jangan memaksa grafik terlalu lebar.
-- **Tablet:** grid 2 kolom bila ruang cukup; sidebar dapat diperkecil atau menggunakan drawer sesuai lebar nyata.
-- **Desktop:** sidebar tetap di kiri; area konten dapat menggunakan grid 12 kolom/bento layout.
-- **Layar lebar:** gunakan batas lebar konten yang wajar agar baris teks dan kartu tidak terlalu melebar.
-- Jangan mengunci seluruh halaman ke `100vh` dengan overflow tersembunyi jika hal itu membuat konten, tabel, modal, atau form tidak dapat dijangkau.
-- Hindari horizontal scroll pada viewport normal, kecuali tabel data memang memiliki kontainer scroll yang disengaja.
-- Uji setidaknya pada lebar sekitar 360 px, 768 px, 1024 px, dan 1440 px.
-
-## 11. Interaksi dan Motion
-
-- Gunakan transisi singkat dan halus untuk hover, focus, dropdown, drawer, dan perubahan status.
-- Durasi animasi umumnya sekitar 150–250 ms.
-- Jangan menambahkan animasi besar hanya untuk membuat UI terlihat ramai.
-- Hormati `prefers-reduced-motion`.
-- Setiap tombol/tautan harus melakukan tindakan nyata; jangan meninggalkan kontrol dekoratif yang tampak interaktif.
-- Sediakan focus state yang terlihat, hover state, disabled state, loading state, dan feedback setelah aksi.
-- Klik di luar drawer/dropdown dan tombol Escape sebaiknya menutup overlay bila sesuai pola komponen.
-
-## 12. Aksesibilitas dan Keterbacaan
-
-- Gunakan elemen semantik dan urutan heading yang benar.
-- Setiap input memiliki label; placeholder bukan pengganti label.
-- Navigasi keyboard harus berfungsi dan focus indicator tidak boleh dihilangkan.
-- Tombol ikon memiliki nama aksesibel.
-- Kontras teks dan status harus memadai.
-- Informasi grafik juga tersedia melalui label, ringkasan, atau tabel.
-- Jangan menyampaikan error hanya dengan warna.
-- Jangan membuat area klik terlalu kecil; target interaksi mobile idealnya sekitar 40–44 px.
-- Uji zoom dan teks panjang, terutama untuk nominal, email, nama kategori, dan deskripsi transaksi.
-
-## 13. State UI Wajib
-
-Untuk setiap fitur yang mengambil atau mengubah data, rancang state berikut sesuai relevansinya:
-
-- **Loading:** skeleton atau indikator yang tidak menggeser layout secara drastis.
-- **Empty:** jelaskan mengapa area kosong dan tindakan berikutnya.
-- **Success:** konfirmasi ringkas setelah aksi berhasil.
-- **Error:** pesan yang dapat dipahami dan tindakan pemulihan jika memungkinkan.
-- **Disabled:** tampilkan alasan jika suatu tindakan tidak tersedia.
-- **Permission denied:** jelaskan akses tidak tersedia tanpa membocorkan data.
-
-Jangan menggunakan angka dummy seolah-olah data nyata. Untuk prototipe, beri label data contoh dengan jelas; pada produksi, gunakan API aktual.
-
-## 14. Bahasa dan Format Lokal
-
-- Bahasa antarmuka utama: Bahasa Indonesia.
-- Mata uang default: Rupiah (IDR).
-- Tanggal dan angka menggunakan format locale Indonesia yang konsisten.
-- Gunakan istilah yang mudah dimengerti: `Pemasukan`, `Pengeluaran`, `Saldo`, `Arus kas`, `Anggaran`, `Kategori`, dan `Laporan`.
-- Hindari istilah Inggris dari referensi seperti “Cash flow”, “Budget”, “My card”, atau “Upgrade to Pro” kecuali ada keputusan produk yang secara eksplisit menghendakinya.
-- Gunakan format tanggal yang konsisten dan tampilkan rentang periode yang dipilih dengan jelas.
-
-## 15. Keamanan dan Privasi dalam UI
-
-- Semua data finansial pribadi harus dibatasi pada pengguna yang sedang login.
-- Jangan menampilkan data pribadi pengguna lain di pencarian, dropdown, grafik, cache, atau state UI.
-- Admin dashboard hanya menampilkan metrik agregat/operasional secara default.
-- Token API tidak boleh muncul dalam log, URL, error message, atau halaman yang tidak berwenang.
-- Masking informasi sensitif bila ada kebutuhan yang sah untuk menampilkannya.
-- Konfirmasi aksi berisiko seperti revoke token dan hapus data.
-- UI bukan pengganti otorisasi backend; semua akses tetap harus diverifikasi di server.
-
-## 16. Implementasi Teknis
-
-- Frontend mengikuti stack yang ditetapkan `CLAUDE.md`: Next.js, TypeScript, dan Tailwind CSS, kecuali repositori yang ada menetapkan pilihan lain.
-- Pisahkan komponen presentasi dari fetching/mutasi data sejauh sesuai arsitektur aplikasi.
-- Gunakan token desain untuk warna, radius, shadow, dan spacing; jangan menyebarkan nilai warna arbitrer di setiap file.
-- Hindari menyalin seluruh HTML referensi menjadi satu komponen monolitik.
-- Adaptasikan layout ke komponen React yang reusable dan data-driven.
-- Gunakan data dari Laravel API; jangan membuat logika bisnis hanya di sisi klien.
-- Jangan menambahkan dependensi baru sebelum memeriksa paket yang sudah tersedia.
-- Pertahankan aksesibilitas, loading/empty/error states, dan responsive behavior ketika membuat halaman baru.
-- Jangan mengubah aturan bisnis, API, atau skema data hanya demi memudahkan tampilan.
-
-## 17. Aturan untuk Coding Agent
-
-Saat mengerjakan UI:
-
-1. Baca `CLAUDE.md`, PRD, dan bagian `DESIGN.md` yang relevan sebelum mulai.
-2. Periksa struktur repositori, komponen yang tersedia, design token, dan pustaka UI/chart yang sudah dipakai.
-3. Buka `acru_financial_dashboard (1).html` bila file tersedia untuk memeriksa detail visual langsung.
-4. Pertahankan karakter referensi: shell terang, sidebar putih, canvas abu-abu muda, kartu putih membulat, shadow lembut, tipografi Inter/Plus Jakarta Sans, aksen lime/hijau/oranye, dan grid dashboard yang responsif.
-5. Ganti konten contoh ACRU dengan kebutuhan aplikasi: IDR, pemasukan, pengeluaran, saldo, anggaran, transaksi, kategori, laporan, dan AI Agent/API Key sesuai halaman.
-6. Gunakan menu produk pada `CLAUDE.md`; jangan menyalin menu Accounts/Investments/Learning Center/Support dari referensi tanpa keputusan produk.
-7. Jangan menyalin data demo, identitas, foto, merek, atau nilai USD dari HTML referensi.
-8. Terapkan gaya yang konsisten pada halaman lain, tetapi pilih layout berdasarkan tugas halaman tersebut.
-9. Pastikan semua interaksi berfungsi dan semua state UI relevan tersedia.
-10. Jalankan lint, type-check, test, atau build yang tersedia. Laporkan dengan jujur bila tidak dapat dijalankan.
-
-## 18. Checklist Review Desain
-
-Sebelum menyatakan halaman selesai, periksa:
-
-- [ ] Visual sesuai arah ACRU tanpa menyalin konten produk yang tidak relevan.
-- [ ] Warna, tipografi, radius, spacing, border, dan shadow konsisten.
-- [ ] Hierarki informasi jelas dan tindakan utama mudah ditemukan.
-- [ ] Bahasa Indonesia dan format IDR digunakan secara konsisten.
-- [ ] Tidak ada angka demo yang disajikan sebagai data nyata.
-- [ ] Desktop, tablet, dan mobile telah diperiksa.
-- [ ] Loading, empty, error, success, dan disabled states tersedia sesuai kebutuhan.
-- [ ] Form memiliki label dan validasi yang jelas.
-- [ ] Keyboard focus, kontras, dan nama aksesibel tersedia.
-- [ ] Tidak ada horizontal overflow atau konten yang terpotong.
-- [ ] Grafik memiliki label/tooltip dan tidak menyesatkan.
-- [ ] Privasi data dan batas akses admin tetap terjaga.
-- [ ] Tombol dan tautan melakukan tindakan nyata.
-- [ ] Komponen yang sudah ada digunakan kembali jika sesuai.
-
----
-
-## Ringkasan Keputusan Desain
-
-Bangun UI yang **terinspirasi oleh ACRU**: minimal, terang, card-based, menggunakan bento grid pada dashboard, dengan aksen lime/hijau/oranye dan tipografi Inter + Plus Jakarta Sans. Adaptasikan semua isi ke aplikasi pencatatan keuangan pribadi berbahasa Indonesia dengan mata uang IDR. Gunakan sistem visual yang sama di seluruh aplikasi, tetapi biarkan tiap halaman memiliki struktur yang paling sesuai dengan tugasnya. Kebutuhan produk, aksesibilitas, privasi, dan keamanan selalu lebih penting daripada meniru referensi secara persis.
+- The exact gradient stops for the spotlight cards are derived from screenshot pixels rather than from CSS variables — the production gradients are likely defined as `linear-gradient` strings on individual elements rather than as design tokens. Treat the documented `{colors.gradient-*}` hex values as base anchors, not as exact gradient specs.
+- Form-field validation / error styling is not visible on the inspected pages because no error states render in the static screenshots.
+- Dark mode is the only mode — no light-mode adaptation is documented because the marketing site does not ship one.
+- The marketplace template detail page returned sparser CSS variable data than the other pages; surface tokens for that page were inferred from the matching home / gallery treatment rather than extracted directly.

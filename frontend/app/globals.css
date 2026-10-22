@@ -27,6 +27,8 @@ body {
   font-family: var(--font-sans);
 }
 
+:root { color-scheme: dark; }
+
 /* ============================================================
    FRAMER DARK SYSTEM — override utilities global
    (unlayered CSS menang atas Tailwind utilities)
@@ -87,9 +89,56 @@ body {
 .text-lime-600 { color: #A3E635; }
 .text-\[\#65A30D\] { color: #A3E635; }
 
-/* CTA brand hitam punya teks gelap (bukan ink putih hasil override) */
-.bg-\[\#8CE533\] { color: #131313; }
-.bg-\[\#7cd02a\] { color: #131313; }
+/* ============================================================
+   PELENGKAP — ink/border/soft-bg yang tersisa (dark all pages)
+   ============================================================ */
+
+/* Ink catch-all */
+.text-gray-800 { color: #E0E0E2; }
+.text-gray-200 { color: #8B8B91; }
+
+/* Semantic ink — lengkap */
+.text-lime-800 { color: #A3E635; }
+.text-green-700 { color: #4ADE80; }
+.text-green-800 { color: #4ADE80; }
+.text-blue-700 { color: #93C5FD; }
+.text-purple-700 { color: #C4B5FD; }
+.text-amber-700 { color: #FBBF24; }
+.text-amber-800 { color: #FBBF24; }
+.text-amber-900 { color: #FDE68A; }
+.text-red-800 { color: #F87171; }
+.text-orange-700 { color: #FB923C; }
+.text-orange-800 { color: #FB923C; }
+
+/* Semantic borders — hairline bertint */
+.border-red-200 { border-color: #3A2026; }
+.border-red-300 { border-color: #4A2A30; }
+.border-green-200 { border-color: #1E3A26; }
+.border-orange-300 { border-color: #4A3A2A; }
+.border-lime-300 { border-color: #2E3A24; }
+.border-amber-200 { border-color: #3A3220; }
+.border-blue-200 { border-color: #1E2F45; }
+
+/* Semantic soft backgrounds — lengkap */
+.bg-green-50 { background-color: #122118; }
+.bg-red-200 { background-color: #3A242A; }
+.bg-amber-50 { background-color: #241F12; }
+.bg-orange-50 { background-color: #241A10; }
+.bg-blue-300 { background-color: #1A2C45; }
+
+/* Placeholder tetap terbaca di surface gelap */
+.placeholder-gray-400::placeholder { color: #8B8B91; }
+
+/* CTA brand lime → pill PUTIH (design system: CTA solid putih) */
+.bg-\[\#8CE533\] { background-color: #F5F5F5; color: #131313; }
+.hover\:bg-\[\#7cd02a\]:hover { background-color: #E9E9EB; color: #131313; }
+.bg-\[\#8CE533\]\/20 { background-color: rgba(245, 245, 245, 0.16); }
+.border-\[\#8CE533\] { border-color: rgba(245, 245, 245, 0.6); }
+.bg-\[\#7cd02a\] { background-color: #E9E9EB; color: #131313; }
+
+/* Focus ring lime terang → accent blue */
+.focus\:ring-\[\#8CE533\]:focus { --tw-ring-color: rgba(147, 197, 253, 0.55); }
+:focus-visible { outline-color: #93C5FD; }
 
 /* Hover states (class terpisah dari base) */
 .hover\:bg-gray-50:hover { background-color: #1B1B1D; }
