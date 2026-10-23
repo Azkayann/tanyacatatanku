@@ -1,0 +1,40 @@
+{
+  "loginSuccess": true,
+  "pagesAccessed": [
+    "/dashboard",
+    "/dashboard/transactions",
+    "/dashboard/accounts",
+    "/dashboard/transfers",
+    "/dashboard/budgets",
+    "/dashboard/recurring",
+    "/dashboard/reports",
+    "/dashboard/categories",
+    "/dashboard/api-tokens",
+    "/dashboard/notifications",
+    "/dashboard/settings"
+  ],
+  "errors": [],
+  "screenshots": [
+    "qa-test-results\\dashboard-screens\\dashboard-desktop.png",
+    "qa-test-results\\dashboard-screens\\dashboard-tablet.png",
+    "qa-test-results\\dashboard-screens\\dashboard-mobile.png",
+    "qa-test-results\\dashboard-screens\\dashboard-transactions.png",
+    "qa-test-results\\dashboard-screens\\dashboard-accounts.png",
+    "qa-test-results\\dashboard-screens\\dashboard-transfers.png",
+    "qa-test-results\\dashboard-screens\\dashboard-budgets.png",
+    "qa-test-results\\dashboard-screens\\dashboard-recurring.png",
+    "qa-test-results\\dashboard-screens\\dashboard-reports.png",
+    "qa-test-results\\dashboard-screens\\dashboard-categories.png",
+    "qa-test-results\\dashboard-screens\\dashboard-api-tokens.png",
+    "qa-test-results\\dashboard-screens\\dashboard-notifications.png",
+    "qa-test-results\\dashboard-screens\\dashboard-settings.png",
+    "qa-test-results\\dashboard-screens\\mobile-transactions.png",
+    "qa-test-results\\dashboard-screens\\mobile-accounts.png"
+  ],
+  "consoleErrors": [],
+  "warnings": [],
+  "interactions": [
+    "Transactions add button: SUCCESS",
+    "Accounts add button: VISIBLE"
+  ]
+}

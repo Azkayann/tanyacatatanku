@@ -32,12 +32,6 @@ function freqLabel(freq: Freq, interval: number) {
   }
 }
 
-const typeColors: Record<string, string> = {
-  income: "bg-green-100 text-[#65A30D]",
-  expense: "bg-red-100 text-red-600",
-  adjustment: "bg-purple-100 text-purple-600",
-};
-
 export default function RecurringPage() {
   const [recurrings, setRecurrings] = useState<RecurringItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -167,53 +161,220 @@ export default function RecurringPage() {
   return (
     <AppShell isAdmin={false}>
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-extrabold text-gray-900 font-display">Transaksi Berulang</h1>
-            <p className="text-sm text-gray-600 mt-1">
-              Otomatiskan tagihan rutin seperti gaji, WiFi, atau cicilan.
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#1A1A1D] border border-[#2A2A2E] flex items-center justify-center text-[#F87171]">
+              <i className="ph ph-arrows-clockwise text-xl"></i>
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-[#F5F5F5] font-display tracking-tight">
+                Transaksi Berulang
+              </h1>
+              <p className="text-xs sm:text-sm text-[#9E9EA4] mt-0.5">
+                Otomatisasi pengeluaran dan pemasukan rutin seperti gaji, tagihan internet, atau sewa.
+              </p>
+            </div>
           </div>
           <button
             onClick={() => setModalOpen(true)}
-            className="px-4 py-2.5 bg-[#8CE533] hover:bg-[#7cd02a] text-gray-900 font-bold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#FFFFFF] text-[#0C0C0E] hover:scale-[1.02] active:scale-[0.98] font-semibold text-sm rounded-full shadow-md transition-all self-start sm:self-auto"
           >
-            <i className="ph ph-plus text-lg"></i>
+            <i className="ph ph-plus text-base font-bold"></i>
             Buat Aturan
           </button>
         </div>
 
+        {error && (
+          <div className="bg-[#2A1418] border border-[#4A2A30] p-4 rounded-xl flex items-center gap-3">
+            <i className="ph ph-warning-circle text-[#F87171] text-xl shrink-0"></i>
+            <div>
+              <p className="text-sm font-semibold text-[#FDA5A5]">Terjadi Kesalahan</p>
+              <p className="text-xs text-[#F87171]">{error}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Loading State Skeleton */}
+        {loading && (
+          <div className="rounded-[20px] border border-[#1F1F22] bg-[#151516] p-8 space-y-4 animate-pulse">
+            <div className="h-4 w-40 bg-[#202023] rounded"></div>
+            <div className="space-y-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-12 bg-[#1A1A1D] rounded-xl"></div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && recurrings.length === 0 && (
+          <div className="rounded-[20px] border border-[#1F1F22] bg-[#151516] p-12 text-center shadow-card">
+            <div className="w-14 h-14 rounded-2xl bg-[#1A1A1D] border border-[#2A2A2E] flex items-center justify-center text-2xl text-[#6E6E74] mx-auto mb-3">
+              <i className="ph ph-repeat"></i>
+            </div>
+            <h3 className="text-base font-semibold text-[#F5F5F5]">Belum Ada Aturan Transaksi Berulang</h3>
+            <p className="text-xs text-[#9E9EA4] mt-1 max-w-sm mx-auto">
+              Jadwalkan pengeluaran rutin Anda agar tercatat otomatis saat jatuh tempo.
+            </p>
+            <button
+              onClick={() => setModalOpen(true)}
+              className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFFFFF] text-[#0C0C0E] hover:scale-[1.02] font-semibold text-xs rounded-full shadow-md transition-all"
+            >
+              <i className="ph ph-plus"></i> Buat Aturan Pertama
+            </button>
+          </div>
+        )}
+
+        {/* Recurrings Table */}
+        {!loading && !error && recurrings.length > 0 && (
+          <div className="rounded-[20px] border border-[#1F1F22] bg-[#151516] overflow-hidden shadow-card">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-[#1A1A1D] border-b border-[#2A2A2E] text-xs font-semibold text-[#6E6E74] uppercase tracking-wider">
+                  <tr>
+                    <th className="px-5 py-3.5">Nama &amp; Akun</th>
+                    <th className="px-5 py-3.5">Frekuensi Jadwal</th>
+                    <th className="px-5 py-3.5">Jatuh Tempo Berikutnya</th>
+                    <th className="px-5 py-3.5 text-right">Nominal</th>
+                    <th className="px-5 py-3.5 text-center">Metode Posting</th>
+                    <th className="px-5 py-3.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#1F1F22] text-sm">
+                  {recurrings.map((item) => (
+                    <tr key={item.id} className={`hover:bg-[#1B1B1D] transition-colors ${!item.is_active ? "opacity-50" : ""}`}>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 border ${
+                            item.type === "income"
+                              ? "bg-[#14241A] text-[#A3E635] border-[#1E3A24]"
+                              : item.type === "expense"
+                              ? "bg-[#2B1F14] text-[#FB923C] border-[#4A3A2A]"
+                              : "bg-[#1F1A33] text-[#C4B5FD] border-[#3A2A4A]"
+                          }`}>
+                            {item.type === "income" ? "Masuk" : item.type === "expense" ? "Keluar" : "Adj"}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-[#F5F5F5] truncate">{item.name}</p>
+                            <p className="text-xs text-[#6E6E74] mt-0.5">
+                              {item.account_name} · {item.category_name || "Penyesuaian"}
+                            </p>
+                            {item.problem && (
+                              <p className="text-xs font-semibold text-[#F87171] mt-0.5">⚠ {item.problem}</p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 text-xs text-[#E0E0E2] whitespace-nowrap">
+                        {freqLabel(item.frequency, item.interval)}
+                        {item.day_of_month && ` · tgl ${item.day_of_month}`}
+                      </td>
+                      <td className="px-5 py-4 text-xs text-[#9E9EA4] whitespace-nowrap">
+                        {formatDate(item.next_run_at)}
+                      </td>
+                      <td className="px-5 py-4 text-right font-bold text-[#F5F5F5] tabular-nums whitespace-nowrap">
+                        {formatRupiah(item.amount)}
+                      </td>
+                      <td className="px-5 py-4 text-center whitespace-nowrap">
+                        <button
+                          onClick={() => toggleAutoPost(item)}
+                          disabled={busyId === item.id}
+                          className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all disabled:opacity-50 ${
+                            item.auto_post
+                              ? "bg-[#14241A] text-[#A3E635] border-[#1E3A24] hover:bg-[#1E301F]"
+                              : "bg-[#2B2114] text-[#FBBF24] border-[#3A3220] hover:bg-[#3A2C18]"
+                          }`}
+                          title="Klik untuk ubah: Otomatis posting langsung atau disimpan sebagai draf"
+                        >
+                          {item.auto_post ? "Otomatis" : "Sebagai Draf"}
+                        </button>
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => toggleActive(item)}
+                            disabled={busyId === item.id}
+                            className="w-8 h-8 rounded-lg bg-[#1A1A1D] border border-[#2A2A2E] hover:border-[#3A3A3F] text-[#9E9EA4] hover:text-[#F5F5F5] inline-flex items-center justify-center transition-colors disabled:opacity-50"
+                            title={item.is_active ? "Nonaktifkan jadwal" : "Aktifkan jadwal"}
+                          >
+                            <i className={`ph ${item.is_active ? "ph-pause" : "ph-play"} text-sm`}></i>
+                          </button>
+                          <button
+                            onClick={() => runAction("skip", item)}
+                            disabled={busyId === item.id}
+                            className="w-8 h-8 rounded-lg bg-[#1A1A1D] border border-[#2A2A2E] hover:border-[#3A3A3F] text-[#9E9EA4] hover:text-[#93C5FD] inline-flex items-center justify-center transition-colors disabled:opacity-50"
+                            title="Lewati jadwal periode ini"
+                          >
+                            <i className={`ph ${busyId === item.id ? "ph-circle-notch animate-spin" : "ph-skip-forward"} text-sm`}></i>
+                          </button>
+                          <button
+                            onClick={() => runAction("run-now", item)}
+                            disabled={busyId === item.id}
+                            className="w-8 h-8 rounded-lg bg-[#1A1A1D] border border-[#2A2A2E] hover:border-[#3A3A3F] text-[#9E9EA4] hover:text-[#A3E635] inline-flex items-center justify-center transition-colors disabled:opacity-50"
+                            title="Eksekusi catat transaksi sekarang"
+                          >
+                            <i className="ph ph-lightning text-sm"></i>
+                          </button>
+                          <button
+                            onClick={() => runAction("delete", item)}
+                            disabled={busyId === item.id}
+                            className="w-8 h-8 rounded-lg bg-[#1A1A1D] border border-[#2A2A2E] hover:border-[#4A2A30] text-[#9E9EA4] hover:text-[#F87171] inline-flex items-center justify-center transition-colors disabled:opacity-50"
+                            title="Hapus aturan berulang"
+                          >
+                            <i className="ph ph-trash text-sm"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Buat Aturan */}
         {modalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-float w-full max-w-lg overflow-auto max-h-[92vh]">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-extrabold text-gray-900 text-lg font-display">Buat Transaksi Berulang</h3>
-                <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">
-                  <i className="ph ph-x text-xl"></i>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <div className="bg-[#151516] rounded-[24px] border border-[#1F1F22] shadow-2xl w-full max-w-lg overflow-hidden animate-fade-in max-h-[90vh] flex flex-col">
+              <div className="px-6 py-4 border-b border-[#1F1F22] flex items-center justify-between shrink-0">
+                <h3 className="font-bold text-[#F5F5F5] text-base font-display">Buat Transaksi Berulang</h3>
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="w-8 h-8 rounded-full bg-[#202023] hover:bg-[#2A2A2E] text-[#9E9EA4] hover:text-[#F5F5F5] flex items-center justify-center transition-colors"
+                >
+                  <i className="ph ph-x text-base"></i>
                 </button>
               </div>
-              <form onSubmit={handleCreate} className="p-6 space-y-4">
+
+              <form onSubmit={handleCreate} className="p-6 space-y-4 overflow-y-auto">
                 {formError && (
-                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">{formError}</div>
-                )}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Nama</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: WiFi Bulanan"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none text-sm col-span-2"
-                    />
+                  <div className="p-3 bg-[#2A1418] border border-[#4A2A30] text-[#F87171] rounded-xl text-xs flex items-center gap-2">
+                    <i className="ph ph-warning-circle text-base shrink-0"></i>
+                    <span>{formError}</span>
                   </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Nama Aturan</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: Tagihan WiFi Indihome, Gaji Kantor, Cicilan Rumah"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-[#F5F5F5] placeholder-[#6E6E74] focus:border-[#465FFF] focus:ring-1 focus:ring-[#465FFF] focus:outline-none transition-all text-sm"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Tipe</label>
+                    <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Jenis</label>
                     <select
                       value={type}
                       onChange={(e) => setType(e.target.value as any)}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none text-sm"
+                      className="w-full px-3 py-2 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-xs font-medium text-[#F5F5F5] focus:border-[#465FFF] focus:outline-none transition-all"
                     >
                       <option value="expense">Pengeluaran</option>
                       <option value="income">Pemasukan</option>
@@ -221,7 +382,7 @@ export default function RecurringPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Nominal (IDR)</label>
+                    <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Nominal (IDR)</label>
                     <input
                       type="number"
                       min="0"
@@ -229,17 +390,18 @@ export default function RecurringPage() {
                       placeholder="100000"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none text-sm"
+                      className="w-full px-4 py-2 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-[#F5F5F5] placeholder-[#6E6E74] focus:border-[#465FFF] focus:ring-1 focus:ring-[#465FFF] focus:outline-none transition-all text-xs font-semibold"
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Akun</label>
+                    <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Akun / Dompet</label>
                     <select
                       value={accountId}
                       onChange={(e) => setAccountId(e.target.value)}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none text-sm"
+                      className="w-full px-3 py-2 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-xs font-medium text-[#F5F5F5] focus:border-[#465FFF] focus:outline-none transition-all"
                     >
                       <option value="">Pilih Akun</option>
                       {accounts.map((acc) => (
@@ -249,12 +411,12 @@ export default function RecurringPage() {
                   </div>
                   {type !== "adjustment" && (
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Kategori</label>
+                      <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Kategori</label>
                       <select
                         required
                         value={categoryId}
                         onChange={(e) => setCategoryId(e.target.value)}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none text-sm"
+                        className="w-full px-3 py-2 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-xs font-medium text-[#F5F5F5] focus:border-[#465FFF] focus:outline-none transition-all"
                       >
                         <option value="">Pilih Kategori</option>
                         {categories.filter((c) => c.type === type).map((cat) => (
@@ -264,13 +426,14 @@ export default function RecurringPage() {
                     </div>
                   )}
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Frekuensi</label>
+                    <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Frekuensi Jadwal</label>
                     <select
                       value={frequency}
                       onChange={(e) => setFrequency(e.target.value as Freq)}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none text-sm"
+                      className="w-full px-3 py-2 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-xs font-medium text-[#F5F5F5] focus:border-[#465FFF] focus:outline-none transition-all"
                     >
                       <option value="weekly">Mingguan</option>
                       <option value="monthly">Bulanan</option>
@@ -280,192 +443,70 @@ export default function RecurringPage() {
                   </div>
                   {frequency === "every_n_months" ? (
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Interval (bulan)</label>
+                      <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Interval (bulan)</label>
                       <input
                         type="number"
                         min="1"
                         value={intervalN}
                         onChange={(e) => setIntervalN(e.target.value)}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none text-sm"
+                        className="w-full px-4 py-2 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-[#F5F5F5] text-xs focus:border-[#465FFF] focus:outline-none"
                       />
                     </div>
-                  ) : (
-                    <div style={{ display: "none" }}></div>
-                  )}
+                  ) : null}
                 </div>
+
                 {needsDayOfMonth && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Tanggal Jatuh Tempo</label>
+                      <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Tanggal Jatuh Tempo (1–31)</label>
                       <input
                         type="number"
                         min="1"
                         max="31"
                         value={dayOfMonth}
                         onChange={(e) => setDayOfMonth(e.target.value)}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none text-sm"
+                        className="w-full px-4 py-2 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-[#F5F5F5] text-xs focus:border-[#465FFF] focus:outline-none"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Hari ke-31 otomatis dipotong di bulan pendek.</p>
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Mulai Tanggal</label>
+                      <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Mulai Tanggal</label>
                       <input
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none text-sm"
+                        className="w-full px-3 py-2 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-xs font-medium text-[#F5F5F5] focus:border-[#465FFF] focus:outline-none"
                       />
                     </div>
                   </div>
                 )}
-                <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+
+                <label className="flex items-center gap-2.5 text-xs text-[#E0E0E2] cursor-pointer pt-2">
                   <input
                     type="checkbox"
                     checked={autoPost}
                     onChange={(e) => setAutoPost(e.target.checked)}
-                    className="w-4 h-4 accent-[#8CE533]"
+                    className="w-4 h-4 rounded bg-[#1A1A1D] border-[#2A2A2E] accent-[#465FFF]"
                   />
-                  Pencatatan otomatis (nonaktifkan untuk membuat draf yang perlu disetujui dulu)
+                  <span>Posting otomatis (nonaktifkan jika ingin ditinjau sebagai draf terlebih dahulu)</span>
                 </label>
-                <div className="pt-4 flex gap-3">
+
+                <div className="pt-3 flex gap-3">
                   <button
                     type="button"
                     onClick={() => setModalOpen(false)}
-                    className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all"
+                    className="flex-1 py-2.5 bg-[#202023] hover:bg-[#2A2A2E] text-[#F5F5F5] border border-[#2A2A2E] font-semibold rounded-full text-xs transition-all"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="flex-1 py-2.5 bg-[#8CE533] hover:bg-[#7cd02a] text-gray-900 font-bold rounded-xl text-sm shadow-sm transition-all disabled:opacity-60"
+                    className="flex-1 py-2.5 bg-[#FFFFFF] text-[#0C0C0E] hover:scale-[1.02] active:scale-[0.98] font-semibold rounded-full text-xs shadow-md transition-all disabled:opacity-50"
                   >
                     {submitting ? "Menyimpan..." : "Simpan Aturan"}
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 p-4 rounded-xl flex items-center gap-3">
-            <i className="ph ph-warning-circle text-red-600 text-xl"></i>
-            <div>
-              <p className="text-sm font-semibold text-red-900">Gagal Memuat Data</p>
-              <p className="text-xs text-red-700">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {loading ? (
-          <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-card text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#8CE533] border-t-transparent"></div>
-            <p className="text-sm text-gray-600 mt-3">Memuat aturan...</p>
-          </div>
-        ) : recurrings.length === 0 ? (
-          <div className="bg-white p-12 rounded-2xl border border-gray-200 shadow-card text-center">
-            <div className="w-16 h-16 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center text-3xl mx-auto mb-4">
-              <i className="ph ph-repeat"></i>
-            </div>
-            <h3 className="text-base font-bold text-gray-900 mb-1">Belum Ada Aturan Berulang</h3>
-            <p className="text-sm text-gray-600 mb-4">Buat aturan untuk transaksi yang terjadi rutin tiap bulan.</p>
-            <button
-              onClick={() => setModalOpen(true)}
-              className="px-4 py-2 bg-[#8CE533] hover:bg-[#7cd02a] text-gray-900 font-bold text-sm rounded-xl transition-all"
-            >
-              Buat Aturan Pertama
-            </button>
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[820px]">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Aturan</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Jadwal</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Berikutnya</th>
-                    <th className="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Nominal</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Auto</th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {recurrings.map((item) => (
-                    <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${!item.is_active ? "opacity-55" : ""}`}>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <span className={`px-2 py-1 rounded-md text-[11px] font-bold uppercase ${typeColors[item.type]}`}>
-                            {item.type === "income" ? "Masuk" : item.type === "expense" ? "Keluar" : "Adj"}
-                          </span>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-900">{item.name}</p>
-                            <p className="text-xs text-gray-500">
-                              {item.account_name} · {item.category_name || "Penyesuaian"}
-                            </p>
-                          </div>
-                        </div>
-                        {item.problem && (
-                          <p className="mt-1 text-xs font-semibold text-red-600">⚠ {item.problem}</p>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {freqLabel(item.frequency, item.interval)}
-                        {item.day_of_month && ` · tgl ${item.day_of_month}`}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{formatDate(item.next_run_at)}</td>
-                      <td className="px-6 py-4 text-right text-sm font-bold text-gray-900">{formatRupiah(item.amount)}</td>
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => toggleAutoPost(item)}
-                          disabled={busyId === item.id}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${
-                            item.auto_post ? "bg-lime-100 text-[#65A30D]" : "bg-amber-100 text-amber-700"
-                          }`}
-                          title="Auto-post: catat otomatis tanpa persetujuan"
-                        >
-                          {item.auto_post ? "Otomatis" : "Draf"}
-                        </button>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-right">
-                        <button
-                          onClick={() => toggleActive(item)}
-                          disabled={busyId === item.id}
-                          className="p-2 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
-                          title={item.is_active ? "Nonaktifkan" : "Aktifkan"}
-                        >
-                          <i className={`ph ${item.is_active ? "ph-pause" : "ph-play"} text-base`}></i>
-                        </button>
-                        <button
-                          onClick={() => runAction("skip", item)}
-                          disabled={busyId === item.id}
-                          className="p-2 text-gray-400 hover:text-blue-600 transition-colors disabled:opacity-50"
-                          title="Lewati jadwal ini"
-                        >
-                          <i className={`ph ${busyId === item.id ? "ph-circle-notch ph-spin" : "ph-skip-forward"} text-base`}></i>
-                        </button>
-                        <button
-                          onClick={() => runAction("run-now", item)}
-                          disabled={busyId === item.id}
-                          className="p-2 text-gray-400 hover:text-[#65A30D] transition-colors disabled:opacity-50"
-                          title="Catat sekarang"
-                        >
-                          <i className="ph ph-lightning text-base"></i>
-                        </button>
-                        <button
-                          onClick={() => runAction("delete", item)}
-                          disabled={busyId === item.id}
-                          className="p-2 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
-                          title="Hapus aturan"
-                        >
-                          <i className="ph ph-trash text-base"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </div>
         )}

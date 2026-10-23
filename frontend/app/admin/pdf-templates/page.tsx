@@ -37,7 +37,7 @@ export default function AdminPdfTemplatesPage() {
       setTemplates(res.data);
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Gagal memuat template.");
+      setError(err.message || "Gagal memuat template laporan.");
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,7 @@ export default function AdminPdfTemplatesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Hapus template ini?")) return;
+    if (!window.confirm("Hapus template PDF ini?")) return;
     setDeletingId(id);
     try {
       await ApiClient.deletePdfTemplate(id);
@@ -81,68 +81,100 @@ export default function AdminPdfTemplatesPage() {
   return (
     <AppShell isAdmin={true}>
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-extrabold text-gray-900 font-display">Template Laporan PDF</h1>
-            <p className="text-sm text-gray-600 mt-1">Kelola template untuk ekspor laporan pengguna.</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20 flex items-center justify-center text-[#F87171]">
+              <i className="ph ph-file-pdf text-xl"></i>
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                Template Laporan PDF
+              </h1>
+              <p className="text-sm text-[#A1A1AA] mt-0.5">
+                Konfigurasi layout dan format cetak laporan keuangan yang dapat diunduh pengguna.
+              </p>
+            </div>
           </div>
           <button
             onClick={() => setModalOpen(true)}
-            className="px-4 py-2.5 bg-[#8CE533] hover:bg-[#7cd02a] text-gray-900 font-bold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
+            className="px-4 py-2 bg-white text-[#0C0C0E] hover:bg-neutral-200 active:scale-[0.98] font-semibold text-xs rounded-full transition-all flex items-center gap-2 self-start sm:self-auto cursor-pointer shadow-sm"
           >
-            <i className="ph ph-plus text-lg"></i>
+            <i className="ph ph-plus-circle text-base"></i>
             Tambah Template
           </button>
         </div>
 
+        {/* Modal Form */}
         {modalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-float w-full max-w-md overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-extrabold text-gray-900 text-lg font-display">Tambah Template PDF</h3>
-                <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">
-                  <i className="ph ph-x text-xl"></i>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fade-in">
+            <div className="bg-[#151516] border border-[#1F1F22] rounded-[24px] shadow-2xl w-full max-w-md overflow-hidden">
+              <div className="px-6 py-4.5 border-b border-[#1F1F22] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-[#202023] border border-[#2A2A2E] flex items-center justify-center text-[#F87171] text-sm">
+                    <i className="ph ph-file-pdf"></i>
+                  </div>
+                  <h3 className="font-semibold text-white text-base">Tambah Template PDF</h3>
+                </div>
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="text-[#71717A] hover:text-white transition-colors cursor-pointer"
+                >
+                  <i className="ph ph-x text-lg"></i>
                 </button>
               </div>
+
               <form onSubmit={handleCreate} className="p-6 space-y-4">
                 {formError && (
-                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">{formError}</div>
+                  <div className="p-3 bg-[#2A1418] border border-[#EF4444]/30 text-[#FCA5A5] rounded-xl text-xs flex items-center gap-2">
+                    <i className="ph ph-warning-circle text-base shrink-0"></i>
+                    {formError}
+                  </div>
                 )}
+
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Nama Template</label>
+                  <label className="block text-xs font-semibold text-[#A1A1AA] uppercase tracking-wider mb-2">
+                    Nama Template
+                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Laporan Bulanan Standar"
+                    placeholder="Contoh: Laporan Bulanan Standar, Rekap Tahunan"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none"
+                    className="w-full px-4 py-2.5 bg-[#0C0C0E] border border-[#2A2A2E] rounded-xl text-xs text-white placeholder-[#71717A] focus:border-[#465FFF] focus:outline-none transition-all"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Jenis Periode</label>
+                  <label className="block text-xs font-semibold text-[#A1A1AA] uppercase tracking-wider mb-2">
+                    Jenis Periode Cetak
+                  </label>
                   <select
                     value={type}
                     onChange={(e) => setType(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none text-sm"
+                    className="w-full px-3 py-2.5 bg-[#0C0C0E] border border-[#2A2A2E] rounded-xl text-xs text-white focus:border-[#465FFF] focus:outline-none transition-all cursor-pointer"
                   >
                     {TYPES.map((t) => (
-                      <option key={t.key} value={t.key}>{t.label}</option>
+                      <option key={t.key} value={t.key}>
+                        {t.label}
+                      </option>
                     ))}
                   </select>
                 </div>
-                <div className="pt-4 flex gap-3">
+
+                <div className="pt-3 flex gap-2.5">
                   <button
                     type="button"
                     onClick={() => setModalOpen(false)}
-                    className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all"
+                    className="flex-1 py-2.5 bg-[#202023] hover:bg-[#2A2A2E] text-white border border-[#2A2A2E] font-medium rounded-full text-xs transition-all cursor-pointer"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="flex-1 py-2.5 bg-[#8CE533] hover:bg-[#7cd02a] text-gray-900 font-bold rounded-xl text-sm shadow-sm transition-all disabled:opacity-60"
+                    className="flex-1 py-2.5 bg-white text-[#0C0C0E] hover:bg-neutral-200 active:scale-[0.98] font-semibold rounded-full text-xs transition-all disabled:opacity-60 cursor-pointer shadow-sm"
                   >
                     {submitting ? "Menyimpan..." : "Simpan Template"}
                   </button>
@@ -153,52 +185,66 @@ export default function AdminPdfTemplatesPage() {
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 p-4 rounded-xl flex items-center gap-3">
-            <i className="ph ph-warning-circle text-red-600 text-xl"></i>
-            <div>
-              <p className="text-sm font-semibold text-red-900">Gagal Memuat Data</p>
-              <p className="text-xs text-red-700">{error}</p>
-            </div>
+          <div className="rounded-xl border border-[#EF4444]/30 bg-[#2A1418] p-4 text-[#FCA5A5] text-xs flex items-center gap-2.5">
+            <i className="ph ph-warning-circle text-base shrink-0"></i>
+            <span>{error}</span>
           </div>
         )}
 
         {loading ? (
-          <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-card text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#8CE533] border-t-transparent"></div>
-            <p className="text-sm text-gray-600 mt-3">Memuat template...</p>
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] p-12 text-center">
+            <div className="inline-block animate-spin rounded-full h-7 w-7 border-2 border-[#93C5FD] border-t-transparent mb-3"></div>
+            <p className="text-xs text-[#71717A]">Memuat daftar template dokumen...</p>
           </div>
         ) : templates.length === 0 ? (
-          <div className="bg-white p-12 rounded-2xl border border-gray-200 shadow-card text-center">
-            <div className="w-16 h-16 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center text-3xl mx-auto mb-4">
-              <i className="ph ph-file-pdf"></i>
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] p-12 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-[#1A1A1D] border border-[#2A2A2E] flex items-center justify-center mx-auto mb-3 text-[#71717A]">
+              <i className="ph ph-file-pdf text-2xl"></i>
             </div>
-            <h3 className="text-base font-bold text-gray-900 mb-1">Belum Ada Template</h3>
-            <p className="text-sm text-gray-600">Buat template laporan PDF pertama.</p>
+            <h3 className="text-sm font-semibold text-white mb-1">Belum Ada Template PDF</h3>
+            <p className="text-xs text-[#71717A] max-w-sm mx-auto">
+              Buat template pertama untuk konfigurasi ekspor dokumen keuangan pengguna.
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {templates.map((tpl) => (
-              <div key={tpl.id} className="bg-white p-6 rounded-2xl border border-gray-200 shadow-card hover:shadow-float transition-all">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl">
-                    <i className="ph ph-file-pdf"></i>
+              <div
+                key={tpl.id}
+                className="rounded-2xl border border-[#1F1F22] bg-[#151516] p-5 hover:border-[#2A2A2E] transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#202023] border border-[#2A2A2E] text-[#F87171] flex items-center justify-center text-xl shrink-0">
+                      <i className="ph ph-file-pdf"></i>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 text-[11px] font-medium bg-[#1A1A1D] border border-[#2A2A2E] text-[#A1A1AA] rounded-md">
+                        {TYPES.find((t) => t.key === tpl.type)?.label || tpl.type}
+                      </span>
+                      {tpl.is_default && (
+                        <span className="px-2 py-0.5 text-[11px] font-medium bg-[#14241A] text-[#4ADE80] border border-[#22C55E]/30 rounded-md">
+                          Bawaan
+                        </span>
+                      )}
+                      <button
+                        onClick={() => handleDelete(tpl.id)}
+                        disabled={deletingId === tpl.id}
+                        className="p-1.5 text-[#71717A] hover:text-[#F87171] hover:bg-[#2A1418] rounded-lg transition-all disabled:opacity-50 cursor-pointer"
+                        title="Hapus template"
+                      >
+                        <i className={`ph ${deletingId === tpl.id ? "ph-spinner ph-spin" : "ph-trash"} text-base`}></i>
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-600 rounded-md">
-                      {TYPES.find((t) => t.key === tpl.type)?.label || tpl.type}
-                    </span>
-                    <button
-                      onClick={() => handleDelete(tpl.id)}
-                      disabled={deletingId === tpl.id}
-                      className="p-2 text-gray-300 hover:text-red-600 transition-colors disabled:opacity-50"
-                      title="Hapus template"
-                    >
-                      <i className="ph ph-trash text-base"></i>
-                    </button>
-                  </div>
+
+                  <h3 className="text-sm font-semibold text-white mb-1">{tpl.name}</h3>
                 </div>
-                <h3 className="text-base font-bold text-gray-900 mb-1">{tpl.name}</h3>
-                <p className="text-xs text-gray-500">Dibuat: {tpl.created_at}</p>
+
+                <div className="mt-4 pt-3 border-t border-[#1F1F22] flex items-center justify-between text-[11px] text-[#71717A]">
+                  <span>Dibuat: {tpl.created_at ? new Date(tpl.created_at).toLocaleDateString("id-ID") : "-"}</span>
+                  <span className="font-mono text-[10px]">ID: {tpl.id?.slice(0, 8)}</span>
+                </div>
               </div>
             ))}
           </div>

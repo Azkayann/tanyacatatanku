@@ -71,7 +71,7 @@ export default function AdminDashboard() {
       <AppShell isAdmin={true}>
         <div className="space-y-5">
           {/* Skeleton welcome */}
-          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5">
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5 hover-lift">
             <div className="rounded-xl bg-[#151516] p-6 h-24 animate-pulse" />
           </div>
           {/* Skeleton KPI grid */}
@@ -128,13 +128,18 @@ export default function AdminDashboard() {
         <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5">
           <div className="rounded-xl bg-gradient-to-r from-[#1A1B35] via-[#1E1F3D] to-[#252547] p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-extrabold text-[#F5F5F5] font-display">
-                  Dashboard Administrator 🛡️
-                </h2>
-                <p className="text-sm text-[#9E9EA4] mt-1">
-                  Pemantauan sistem, metrik operasional, dan audit platform.
-                </p>
+              <div className="flex items-center gap-3 animate-fade-up">
+                <div className="w-10 h-10 rounded-xl bg-[#1F1F22] flex items-center justify-center icon-glow">
+                  <i className="ph ph-shield-check text-xl text-[#93C5FD]"></i>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-extrabold text-[#F5F5F5] font-display">
+                    Dashboard Administrator 🛡️
+                  </h2>
+                  <p className="text-sm text-[#9E9EA4] mt-1">
+                    Pemantauan sistem, metrik operasional, dan audit platform.
+                  </p>
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-[#14241A] text-[#A3E635]">
@@ -163,7 +168,7 @@ export default function AdminDashboard() {
         {/* =========== Row 1: KPI Metric Cards =========== */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Card 1: Total Pengguna */}
-          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5">
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5 hover-lift">
             <div className="rounded-xl bg-[#151516] p-5 h-full">
               <div className="flex items-start justify-between mb-3">
                 <span className="text-sm font-semibold text-[#9E9EA4]">Total Pengguna</span>
@@ -181,7 +186,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Card 2: Pengguna Aktif */}
-          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5">
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5 hover-lift">
             <div className="rounded-xl bg-[#151516] p-5 h-full">
               <div className="flex items-start justify-between mb-3">
                 <span className="text-sm font-semibold text-[#9E9EA4]">Pengguna Aktif</span>
@@ -199,7 +204,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Card 3: Request API (24j) */}
-          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5">
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5 hover-lift">
             <div className="rounded-xl bg-[#151516] p-5 h-full">
               <div className="flex items-start justify-between mb-3">
                 <span className="text-sm font-semibold text-[#9E9EA4]">Request API (24j)</span>
@@ -217,7 +222,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Card 4: Total Transaksi */}
-          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5">
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5 hover-lift">
             <div className="rounded-xl bg-[#151516] p-5 h-full">
               <div className="flex items-start justify-between mb-3">
                 <span className="text-sm font-semibold text-[#9E9EA4]">Total Transaksi</span>

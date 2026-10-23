@@ -1,24 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { AppShell } from "../../components/AppShell";
 import ApiClient, { UserNotification } from "../../../lib/api";
 
-function getIcon(type: string) {
+function getNotificationStyles(type: string) {
   switch (type) {
-    case "warning": return "ph-warning text-orange-600";
-    case "success": return "ph-check-circle text-[#65A30D]";
-    case "info": return "ph-info text-blue-600";
-    default: return "ph-bell text-gray-600";
-  }
-}
-
-function getBgColor(type: string) {
-  switch (type) {
-    case "warning": return "bg-orange-100";
-    case "success": return "bg-green-100";
-    case "info": return "bg-blue-100";
-    default: return "bg-gray-100";
+    case "warning":
+      return {
+        icon: "ph-warning",
+        container: "bg-[#2B1F14] text-[#FBBF24] border-[#F59E0B]/30",
+      };
+    case "success":
+      return {
+        icon: "ph-check-circle",
+        container: "bg-[#14241A] text-[#4ADE80] border-[#22C55E]/30",
+      };
+    case "info":
+      return {
+        icon: "ph-info",
+        container: "bg-[#14243A] text-[#60A5FA] border-[#3B82F6]/30",
+      };
+    default:
+      return {
+        icon: "ph-bell",
+        container: "bg-[#202023] text-[#A1A1AA] border-[#2A2A2E]",
+      };
   }
 }
 
@@ -28,6 +35,7 @@ export default function NotificationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [markingAll, setMarkingAll] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
 
   async function loadNotifications() {
     try {
@@ -46,7 +54,14 @@ export default function NotificationsPage() {
     loadNotifications();
   }, []);
 
-  const unreadCount = notifications.filter((n) => !n.read_at).length;
+  const unreadCount = useMemo(() => notifications.filter((n) => !n.read_at).length, [notifications]);
+
+  const filteredNotifications = useMemo(() => {
+    if (activeTab === "unread") {
+      return notifications.filter((n) => !n.read_at);
+    }
+    return notifications;
+  }, [notifications, activeTab]);
 
   async function handleMarkRead(id: string) {
     try {
@@ -86,92 +101,159 @@ export default function NotificationsPage() {
   return (
     <AppShell isAdmin={false}>
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-extrabold text-gray-900 font-display">
-              Notifikasi
-            </h1>
-            <p className="text-sm text-gray-600 mt-1">
-              {unreadCount > 0 ? `${unreadCount} notifikasi belum dibaca.` : "Semua notifikasi sudah dibaca."}
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#F72585]/10 border border-[#F72585]/20 flex items-center justify-center text-[#F472B6]">
+              <i className="ph ph-bell text-xl"></i>
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                Notifikasi
+              </h1>
+              <p className="text-sm text-[#A1A1AA] mt-0.5">
+                {unreadCount > 0 ? (
+                  <span>
+                    Ada <strong className="text-white">{unreadCount}</strong> pemberitahuan yang belum dibaca.
+                  </span>
+                ) : (
+                  "Semua pemberitahuan akun sudah dibaca."
+                )}
+              </p>
+            </div>
           </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleMarkAll}
+              disabled={markingAll || unreadCount === 0}
+              className="px-4 py-2 bg-[#202023] hover:bg-[#2A2A2E] text-white border border-[#2A2A2E] text-xs font-semibold rounded-full transition-all flex items-center gap-1.5 disabled:opacity-40 cursor-pointer"
+            >
+              <i className="ph ph-checks text-base"></i>
+              {markingAll ? "Memproses..." : "Tandai Semua Dibaca"}
+            </button>
+          </div>
+        </div>
+
+        {/* Tab Filters */}
+        <div className="flex items-center gap-2 border-b border-[#1F1F22] pb-3">
           <button
-            onClick={handleMarkAll}
-            disabled={markingAll || unreadCount === 0}
-            className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            onClick={() => setActiveTab("all")}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+              activeTab === "all"
+                ? "bg-white text-[#0C0C0E] font-semibold"
+                : "bg-[#1A1A1D] border border-[#2A2A2E] text-[#A1A1AA] hover:text-white"
+            }`}
           >
-            <i className="ph ph-checks text-lg"></i>
-            {markingAll ? "Memproses..." : "Tandai Semua Dibaca"}
+            Semua ({notifications.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("unread")}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+              activeTab === "unread"
+                ? "bg-white text-[#0C0C0E] font-semibold"
+                : "bg-[#1A1A1D] border border-[#2A2A2E] text-[#A1A1AA] hover:text-white"
+            }`}
+          >
+            Belum Dibaca
+            {unreadCount > 0 && (
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                activeTab === "unread" ? "bg-[#0C0C0E] text-white" : "bg-[#465FFF] text-white"
+              }`}>
+                {unreadCount}
+              </span>
+            )}
           </button>
         </div>
 
+        {/* Error Alert */}
         {error && (
-          <div className="bg-red-50 border border-red-200 p-4 rounded-xl flex items-center gap-3">
-            <i className="ph ph-warning-circle text-red-600 text-xl"></i>
-            <div>
-              <p className="text-sm font-semibold text-red-900">Gagal Memuat Data</p>
-              <p className="text-xs text-red-700">{error}</p>
-            </div>
+          <div className="rounded-xl border border-[#EF4444]/30 bg-[#2A1418] p-4 text-[#FCA5A5] text-xs flex items-center gap-2.5">
+            <i className="ph ph-warning-circle text-base shrink-0"></i>
+            <span>{error}</span>
           </div>
         )}
 
+        {/* List Content */}
         {loading ? (
-          <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-card text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#8CE533] border-t-transparent"></div>
-            <p className="text-sm text-gray-600 mt-3">Memuat notifikasi...</p>
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] p-12 text-center">
+            <div className="inline-block animate-spin rounded-full h-7 w-7 border-2 border-[#93C5FD] border-t-transparent mb-3"></div>
+            <p className="text-xs text-[#71717A]">Memuat daftar notifikasi...</p>
           </div>
-        ) : notifications.length === 0 ? (
-          <div className="bg-white p-12 rounded-2xl border border-gray-200 shadow-card text-center">
-            <div className="w-16 h-16 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center text-3xl mx-auto mb-4">
-              <i className="ph ph-bell-slash"></i>
+        ) : filteredNotifications.length === 0 ? (
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] p-12 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-[#1A1A1D] border border-[#2A2A2E] flex items-center justify-center mx-auto mb-3 text-[#71717A]">
+              <i className="ph ph-bell-slash text-2xl"></i>
             </div>
-            <h3 className="text-base font-bold text-gray-900 mb-1">Belum Ada Notifikasi</h3>
-            <p className="text-sm text-gray-600">
-              Anda akan menerima notifikasi untuk transaksi, anggaran, dan pengingat di sini.
+            <h3 className="text-sm font-semibold text-white mb-1">
+              {activeTab === "unread" ? "Tidak Ada Notifikasi Baru" : "Belum Ada Notifikasi"}
+            </h3>
+            <p className="text-xs text-[#71717A] max-w-sm mx-auto">
+              {activeTab === "unread"
+                ? "Semua notifikasi transaksi dan sistem sudah dibaca."
+                : "Aktivitas transaksi rutin, ambang batas anggaran, dan peringatan akun akan tampil di sini."}
             </p>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-card divide-y divide-gray-100">
-            {notifications.map((notif) => (
-              <div
-                key={notif.id}
-                className="p-5 hover:bg-gray-50 transition-all flex items-start justify-between gap-3"
-              >
-                <button
-                  onClick={() => !notif.read_at && handleMarkRead(notif.id)}
-                  className={`flex-1 flex items-start gap-4 text-left ${!notif.read_at ? "bg-lime-50/30 rounded-xl p-3 -m-3" : ""}`}
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] overflow-hidden divide-y divide-[#1F1F22]">
+            {filteredNotifications.map((notif) => {
+              const styles = getNotificationStyles(notif.type);
+              const isUnread = !notif.read_at;
+
+              return (
+                <div
+                  key={notif.id}
+                  className={`p-4 sm:p-5 transition-colors flex items-start justify-between gap-4 ${
+                    isUnread ? "bg-[#1A1A1D]/70 hover:bg-[#1A1A1D]" : "hover:bg-[#1A1A1D]/30"
+                  }`}
                 >
-                  <div className={`w-10 h-10 rounded-xl ${getBgColor(notif.type)} flex items-center justify-center text-xl flex-shrink-0`}>
-                    <i className={getIcon(notif.type)}></i>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="text-sm font-bold text-gray-900">
-                        {notif.title}
-                        {!notif.read_at && (
-                          <span className="ml-2 w-2 h-2 rounded-full bg-[#8CE533] inline-block"></span>
-                        )}
-                      </h3>
-                      <span className="text-xs text-gray-500 whitespace-nowrap">
-                        {new Date(notif.created_at).toLocaleDateString("id-ID", {
-                          day: "numeric",
-                          month: "short",
-                        })}
-                      </span>
+                  <button
+                    onClick={() => isUnread && handleMarkRead(notif.id)}
+                    className="flex-1 flex items-start gap-3.5 text-left cursor-pointer min-w-0"
+                  >
+                    <div
+                      className={`w-9 h-9 rounded-xl border ${styles.container} flex items-center justify-center text-lg shrink-0 mt-0.5`}
+                    >
+                      <i className={`ph ${styles.icon}`}></i>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">{notif.message}</p>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h3 className={`text-sm font-semibold truncate ${isUnread ? "text-white" : "text-[#D4D4D8]"}`}>
+                            {notif.title}
+                          </h3>
+                          {isUnread && (
+                            <span className="w-2 h-2 rounded-full bg-[#465FFF] shrink-0" title="Belum dibaca"></span>
+                          )}
+                        </div>
+                        <span className="text-[11px] text-[#71717A] shrink-0">
+                          {new Date(notif.created_at).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "short",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-[#A1A1AA] leading-relaxed break-words">{notif.message}</p>
+                    </div>
+                  </button>
+
+                  <div className="flex items-center gap-1 shrink-0 self-center sm:self-start">
+                    <button
+                      onClick={() => handleDelete(notif.id)}
+                      disabled={deletingId === notif.id}
+                      className="p-1.5 text-[#71717A] hover:text-[#F87171] hover:bg-[#2A1418] rounded-lg transition-all disabled:opacity-50 cursor-pointer"
+                      title="Hapus pemberitahuan"
+                    >
+                      <i className={`ph ${deletingId === notif.id ? "ph-spinner ph-spin" : "ph-trash"} text-base`}></i>
+                    </button>
                   </div>
-                </button>
-                <button
-                  onClick={() => handleDelete(notif.id)}
-                  disabled={deletingId === notif.id}
-                  className="p-2 text-gray-300 hover:text-red-600 transition-colors disabled:opacity-50 self-start"
-                  title="Hapus notifikasi"
-                >
-                  <i className={`ph ${deletingId === notif.id ? "ph-circle-notch ph-spin" : "ph-trash"} text-base`}></i>
-                </button>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

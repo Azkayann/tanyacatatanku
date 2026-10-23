@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { AppShell } from "../../components/AppShell";
 import ApiClient, { AuditLog } from "../../../lib/api";
 
@@ -8,7 +8,10 @@ export default function AdminAuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [actionFilter, setActionFilter] = useState("");
+
+  // Filters
+  const [search, setSearch] = useState("");
+  const [resultFilter, setResultFilter] = useState<"all" | "success" | "failed">("all");
 
   useEffect(() => {
     async function loadLogs() {
@@ -18,7 +21,7 @@ export default function AdminAuditLogsPage() {
         setLogs(res.data);
         setError(null);
       } catch (err: any) {
-        setError(err.message || "Gagal memuat audit log.");
+        setError(err.message || "Gagal memuat log audit aktivitas.");
       } finally {
         setLoading(false);
       }
@@ -26,79 +29,176 @@ export default function AdminAuditLogsPage() {
     loadLogs();
   }, []);
 
-  const filtered = actionFilter ? logs.filter((l) => l.action.includes(actionFilter)) : logs;
+  const filteredLogs = useMemo(() => {
+    return logs.filter((log) => {
+      const matchSearch =
+        log.action?.toLowerCase().includes(search.toLowerCase()) ||
+        log.actor?.toLowerCase().includes(search.toLowerCase()) ||
+        log.ip_address?.toLowerCase().includes(search.toLowerCase()) ||
+        log.object_type?.toLowerCase().includes(search.toLowerCase());
+
+      const matchResult =
+        resultFilter === "all" ||
+        (resultFilter === "success" && log.result === "success") ||
+        (resultFilter === "failed" && log.result !== "success");
+
+      return matchSearch && matchResult;
+    });
+  }, [logs, search, resultFilter]);
+
+  const totalSuccess = logs.filter((l) => l.result === "success").length;
+  const totalFailed = logs.filter((l) => l.result !== "success").length;
 
   return (
     <AppShell isAdmin={true}>
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-extrabold text-gray-900 font-display">Audit Log</h1>
-            <p className="text-sm text-gray-600 mt-1">Riwayat aktivitas sistem dan akses administratif.</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#C4B5FD]/10 border border-[#C4B5FD]/20 flex items-center justify-center text-[#C4B5FD]">
+              <i className="ph ph-scroll text-xl"></i>
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                Audit Trail & Log Aktivitas
+              </h1>
+              <p className="text-sm text-[#A1A1AA] mt-0.5">
+                Pencatatan riwayat aksi administratif, security events, dan interaksi pengguna sistem.
+              </p>
+            </div>
           </div>
-          <input
-            type="text"
-            placeholder="Filter aksi..."
-            value={actionFilter}
-            onChange={(e) => setActionFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#8CE533] focus:outline-none"
-          />
+        </div>
+
+        {/* 3 Metric Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] p-4 sm:p-5">
+            <div className="flex items-center justify-between text-xs text-[#A1A1AA] mb-2 font-medium">
+              <span>Total Catatan Log</span>
+              <i className="ph ph-file-text text-base text-[#93C5FD]"></i>
+            </div>
+            <div className="text-2xl font-bold text-white tracking-tight">{logs.length}</div>
+            <div className="text-[11px] text-[#71717A] mt-1">Seluruh mutasi tercatat</div>
+          </div>
+
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] p-4 sm:p-5">
+            <div className="flex items-center justify-between text-xs text-[#A1A1AA] mb-2 font-medium">
+              <span>Aksi Berhasil</span>
+              <i className="ph ph-check-circle text-base text-[#4ADE80]"></i>
+            </div>
+            <div className="text-2xl font-bold text-[#4ADE80] tracking-tight">{totalSuccess}</div>
+            <div className="text-[11px] text-[#71717A] mt-1">Hasil eksekusi normal</div>
+          </div>
+
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] p-4 sm:p-5">
+            <div className="flex items-center justify-between text-xs text-[#A1A1AA] mb-2 font-medium">
+              <span>Anomali / Gagal</span>
+              <i className="ph ph-warning-circle text-base text-[#F87171]"></i>
+            </div>
+            <div className={`text-2xl font-bold tracking-tight ${totalFailed > 0 ? "text-[#F87171]" : "text-white"}`}>
+              {totalFailed}
+            </div>
+            <div className="text-[11px] text-[#71717A] mt-1">Perlu perhatian security</div>
+          </div>
+        </div>
+
+        {/* Filter Bar */}
+        <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="relative flex-1 max-w-md">
+            <i className="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-[#71717A]"></i>
+            <input
+              type="text"
+              placeholder="Cari berdasarkan aksi, aktor, atau alamat IP..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-[#0C0C0E] border border-[#2A2A2E] rounded-xl text-xs text-white placeholder-[#71717A] focus:border-[#465FFF] focus:outline-none transition-all"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select
+              value={resultFilter}
+              onChange={(e) => setResultFilter(e.target.value as any)}
+              className="px-3 py-2 bg-[#0C0C0E] border border-[#2A2A2E] rounded-xl text-xs text-white focus:border-[#465FFF] focus:outline-none transition-all cursor-pointer"
+            >
+              <option value="all">Semua Hasil</option>
+              <option value="success">Berhasil Saja</option>
+              <option value="failed">Gagal / Ditolak</option>
+            </select>
+          </div>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 p-4 rounded-xl flex items-center gap-3">
-            <i className="ph ph-warning-circle text-red-600 text-xl"></i>
-            <div>
-              <p className="text-sm font-semibold text-red-900">Gagal Memuat Data</p>
-              <p className="text-xs text-red-700">{error}</p>
-            </div>
+          <div className="rounded-xl border border-[#EF4444]/30 bg-[#2A1418] p-4 text-[#FCA5A5] text-xs flex items-center gap-2.5">
+            <i className="ph ph-warning-circle text-base shrink-0"></i>
+            <span>{error}</span>
           </div>
         )}
 
+        {/* Table Content */}
         {loading ? (
-          <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-card text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#8CE533] border-t-transparent"></div>
-            <p className="text-sm text-gray-600 mt-3">Memuat audit log...</p>
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] p-12 text-center">
+            <div className="inline-block animate-spin rounded-full h-7 w-7 border-2 border-[#93C5FD] border-t-transparent mb-3"></div>
+            <p className="text-xs text-[#71717A]">Memuat riwayat log audit sistem...</p>
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="bg-white p-12 rounded-2xl border border-gray-200 shadow-card text-center">
-            <i className="ph ph-shield-warning text-3xl text-gray-300 mx-auto block mb-3"></i>
-            <h3 className="text-base font-bold text-gray-900 mb-1">Belum Ada Aktivitas</h3>
-            <p className="text-sm text-gray-600">Aktivitas login, registrasi, dan token akan diembang di sini.</p>
+        ) : filteredLogs.length === 0 ? (
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] p-12 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-[#1A1A1D] border border-[#2A2A2E] flex items-center justify-center mx-auto mb-3 text-[#71717A]">
+              <i className="ph ph-scroll text-2xl"></i>
+            </div>
+            <h3 className="text-sm font-semibold text-white mb-1">Tidak Ada Catatan Log</h3>
+            <p className="text-xs text-[#71717A] max-w-sm mx-auto">
+              Belum ada rekaman audit trail atau tidak ada log yang cocok dengan filter.
+            </p>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#151516] overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Waktu</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Aktor</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Aksi</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Objek</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Hasil</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">IP</th>
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-[#1F1F22] bg-[#1A1A1D]/50 text-[#A1A1AA] font-mono uppercase tracking-wider text-[11px]">
+                    <th className="px-5 py-3.5">Waktu Akses</th>
+                    <th className="px-5 py-3.5">Aktor</th>
+                    <th className="px-5 py-3.5">Aksi / Event</th>
+                    <th className="px-5 py-3.5">Target Objek</th>
+                    <th className="px-5 py-3.5">Status</th>
+                    <th className="px-5 py-3.5">Alamat IP</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filtered.map((log) => (
-                    <tr key={log.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-600">{log.created_at}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900 font-medium">{log.actor}</td>
-                      <td className="px-6 py-4">
-                        <code className="px-2 py-0.5 text-xs font-mono bg-gray-100 text-gray-700 rounded">{log.action}</code>
+                <tbody className="divide-y divide-[#1F1F22]">
+                  {filteredLogs.map((log) => (
+                    <tr key={log.id} className="hover:bg-[#1A1A1D]/60 transition-colors">
+                      <td className="px-5 py-3.5 text-[#71717A] font-mono whitespace-nowrap">
+                        {log.created_at
+                          ? new Date(log.created_at).toLocaleString("id-ID", {
+                              day: "numeric",
+                              month: "short",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit",
+                            })
+                          : "-"}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {log.object_type ? `${log.object_type}:${log.object_id || "-"}` : "-"}
+                      <td className="px-5 py-3.5 text-white font-medium">{log.actor || "Sistem"}</td>
+                      <td className="px-5 py-3.5">
+                        <code className="px-2 py-0.5 text-[11px] font-mono bg-[#0C0C0E] text-[#93C5FD] border border-[#2A2A2E] rounded">
+                          {log.action}
+                        </code>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 text-xs font-semibold rounded-md ${
-                          log.result === "success" ? "bg-green-100 text-[#65A30D]" : "bg-red-100 text-red-600"
-                        }`}>
+                      <td className="px-5 py-3.5 text-[#A1A1AA] font-mono">
+                        {log.object_type ? `${log.object_type}:${log.object_id ? log.object_id.slice(0, 8) : "-"}` : "-"}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span
+                          className={`px-2 py-0.5 text-[11px] font-semibold rounded-full border ${
+                            log.result === "success"
+                              ? "bg-[#14241A] text-[#4ADE80] border-[#22C55E]/30"
+                              : "bg-[#2A1418] text-[#F87171] border-[#EF4444]/30"
+                          }`}
+                        >
                           {log.result}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-xs text-gray-400">{log.ip_address || "-"}</td>
+                      <td className="px-5 py-3.5 text-[#71717A] font-mono">{log.ip_address || "127.0.0.1"}</td>
                     </tr>
                   ))}
                 </tbody>

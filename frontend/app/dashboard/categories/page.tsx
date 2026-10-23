@@ -166,62 +166,280 @@ export default function CategoriesPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-extrabold text-gray-900 font-display">
-              Kategori
-            </h1>
-            <p className="text-sm text-gray-600 mt-1">
-              Atur kategori untuk mengklasifikasikan pemasukan dan pengeluaran.
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#1A1A1D] border border-[#2A2A2E] flex items-center justify-center text-[#C4B5FD]">
+              <i className="ph ph-tag text-xl"></i>
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-[#F5F5F5] font-display tracking-tight">
+                Kategori Transaksi
+              </h1>
+              <p className="text-xs sm:text-sm text-[#9E9EA4] mt-0.5">
+                Klasifikasikan pemasukan dan pengeluaran agar analisis keuangan akurat.
+              </p>
+            </div>
           </div>
           <button
             onClick={() => setModalOpen(true)}
-            className="px-4 py-2.5 bg-[#8CE533] hover:bg-[#7cd02a] text-gray-900 font-bold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#FFFFFF] text-[#0C0C0E] hover:scale-[1.02] active:scale-[0.98] font-semibold text-sm rounded-full shadow-md transition-all self-start sm:self-auto"
           >
-            <i className="ph ph-plus text-lg"></i>
+            <i className="ph ph-plus text-base font-bold"></i>
             Tambah Kategori
           </button>
         </div>
 
+        {/* 3 Metric Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5 shadow-card">
+            <div className="rounded-xl bg-[#151516] p-5 h-full">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider">Total Kategori</span>
+                <div className="w-9 h-9 rounded-xl bg-[#1A1B2E] text-[#93C5FD] flex items-center justify-center text-lg">
+                  <i className="ph ph-tag"></i>
+                </div>
+              </div>
+              <p className="text-2xl font-extrabold text-[#F5F5F5] font-display tracking-tight">
+                {categories.length}
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5 shadow-card">
+            <div className="rounded-xl bg-[#151516] p-5 h-full">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider">Kategori Pemasukan</span>
+                <div className="w-9 h-9 rounded-xl bg-[#14241A] text-[#A3E635] flex items-center justify-center text-lg">
+                  <i className="ph ph-arrow-down-left"></i>
+                </div>
+              </div>
+              <p className="text-2xl font-extrabold text-[#F5F5F5] font-display tracking-tight">
+                {incomeCount}
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5 shadow-card">
+            <div className="rounded-xl bg-[#151516] p-5 h-full">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider">Kategori Pengeluaran</span>
+                <div className="w-9 h-9 rounded-xl bg-[#2B1F14] text-[#FB923C] flex items-center justify-center text-lg">
+                  <i className="ph ph-arrow-up-right"></i>
+                </div>
+              </div>
+              <p className="text-2xl font-extrabold text-[#F5F5F5] font-display tracking-tight">
+                {expenseCount}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Warning transaksi tanpa kategori */}
+        {uncategorizedCount > 0 && (
+          <div className="bg-[#2B2114] border border-[#3A3220] p-4 rounded-2xl flex items-center gap-3">
+            <i className="ph ph-warning-circle text-[#FBBF24] text-xl shrink-0"></i>
+            <div>
+              <p className="text-sm font-bold text-[#FDE68A]">
+                {uncategorizedCount} transaksi belum memiliki kategori
+              </p>
+              <p className="text-xs text-[#FBBF24] mt-0.5">
+                Gunakan fitur gabungkan kategori atau perbarui transaksi secara manual agar laporan terdata utuh.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Filter Pills */}
+        <div className="rounded-[18px] border border-[#1F1F22] bg-[#151516] p-3 flex flex-wrap items-center justify-between gap-3 shadow-card">
+          <div className="flex items-center gap-2">
+            {[
+              { key: "all", label: "Semua Kategori" },
+              { key: "income", label: "Pemasukan" },
+              { key: "expense", label: "Pengeluaran" },
+            ].map((item) => (
+              <button
+                key={item.key}
+                onClick={() => setFilter(item.key as any)}
+                className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all ${
+                  filter === item.key
+                    ? "bg-[#FFFFFF] text-[#0C0C0E] shadow"
+                    : "bg-[#1A1A1D] text-[#9E9EA4] border border-[#2A2A2E] hover:text-[#F5F5F5]"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+          <span className="text-xs text-[#6E6E74]">
+            {filteredCategories.length} kategori ditampilkan
+          </span>
+        </div>
+
+        {error && (
+          <div className="bg-[#2A1418] border border-[#4A2A30] p-4 rounded-xl flex items-center gap-3">
+            <i className="ph ph-warning-circle text-[#F87171] text-xl shrink-0"></i>
+            <div>
+              <p className="text-sm font-semibold text-[#FDA5A5]">Gagal Memuat Data</p>
+              <p className="text-xs text-[#F87171]">{error}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Loading State Skeleton */}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5 animate-pulse">
+                <div className="rounded-xl bg-[#151516] p-5 h-36"></div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && filteredCategories.length === 0 && (
+          <div className="rounded-[20px] border border-[#1F1F22] bg-[#151516] p-12 text-center shadow-card">
+            <div className="w-14 h-14 rounded-2xl bg-[#1A1A1D] border border-[#2A2A2E] flex items-center justify-center text-2xl text-[#6E6E74] mx-auto mb-3">
+              <i className="ph ph-tag"></i>
+            </div>
+            <h3 className="text-base font-semibold text-[#F5F5F5]">Belum Ada Kategori</h3>
+            <p className="text-xs text-[#9E9EA4] mt-1 max-w-sm mx-auto">
+              Buat kategori baru untuk mengelompokkan catatan transaksi Anda.
+            </p>
+            <button
+              onClick={() => setModalOpen(true)}
+              className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFFFFF] text-[#0C0C0E] hover:scale-[1.02] font-semibold text-xs rounded-full shadow-md transition-all"
+            >
+              <i className="ph ph-plus"></i> Tambah Kategori
+            </button>
+          </div>
+        )}
+
+        {/* Categories Grid */}
+        {!loading && !error && filteredCategories.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredCategories.map((category) => (
+              <div
+                key={category.id}
+                className="rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5 hover:border-[#2A2A2E] transition-all group"
+              >
+                <div className="rounded-xl bg-[#151516] p-5 h-full flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-start justify-between mb-3">
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+                          category.type === "income"
+                            ? "bg-[#14241A] text-[#A3E635] border border-[#1E3A24]"
+                            : "bg-[#2B1F14] text-[#FB923C] border border-[#4A3A2A]"
+                        }`}
+                      >
+                        <i className="ph ph-tag"></i>
+                      </div>
+                      {!category.is_system && (
+                        <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => {
+                              setMergeSource(category);
+                              setMergeTargetId("");
+                            }}
+                            className="w-7 h-7 rounded-lg bg-[#202023] hover:bg-[#2A2A2E] text-[#9E9EA4] hover:text-[#93C5FD] border border-[#2A2A2E] inline-flex items-center justify-center transition-colors"
+                            title="Gabungkan kategori"
+                          >
+                            <i className="ph ph-shuffle text-xs"></i>
+                          </button>
+                          <button
+                            onClick={() => openRename(category)}
+                            className="w-7 h-7 rounded-lg bg-[#202023] hover:bg-[#2A2A2E] text-[#9E9EA4] hover:text-[#F5F5F5] border border-[#2A2A2E] inline-flex items-center justify-center transition-colors"
+                            title="Ganti nama"
+                          >
+                            <i className="ph ph-pencil-simple text-xs"></i>
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirm(category)}
+                            className="w-7 h-7 rounded-lg bg-[#202023] hover:bg-[#2A2A2E] text-[#9E9EA4] hover:text-[#F87171] border border-[#2A2A2E] inline-flex items-center justify-center transition-colors"
+                            title="Hapus kategori"
+                          >
+                            <i className="ph ph-trash text-xs"></i>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="text-base font-bold text-[#F5F5F5] truncate mb-2">
+                      {category.name}
+                    </h3>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-[#1F1F22] text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                          category.type === "income"
+                            ? "bg-[#14241A] text-[#A3E635] border border-[#1E3A24]"
+                            : "bg-[#2B1F14] text-[#FB923C] border border-[#4A3A2A]"
+                        }`}
+                      >
+                        {category.type === "income" ? "Pemasukan" : "Pengeluaran"}
+                      </span>
+                      {category.is_system && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#202023] text-[#9E9EA4] border border-[#2A2A2E]">
+                          Sistem
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-[#6E6E74] font-medium">
+                      {category.transaction_count ?? 0} transaksi
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Modal Tambah Kategori */}
         {modalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-float w-full max-w-md overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-extrabold text-gray-900 text-lg font-display">Tambah Kategori Baru</h3>
-                <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">
-                  <i className="ph ph-x text-xl"></i>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <div className="bg-[#151516] rounded-[24px] border border-[#1F1F22] shadow-2xl w-full max-w-md overflow-hidden animate-fade-in">
+              <div className="px-6 py-4 border-b border-[#1F1F22] flex items-center justify-between">
+                <h3 className="font-bold text-[#F5F5F5] text-base font-display">Tambah Kategori Baru</h3>
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="w-8 h-8 rounded-full bg-[#202023] hover:bg-[#2A2A2E] text-[#9E9EA4] hover:text-[#F5F5F5] flex items-center justify-center transition-colors"
+                >
+                  <i className="ph ph-x text-base"></i>
                 </button>
               </div>
               <form onSubmit={handleCreate} className="p-6 space-y-4">
                 {formError && (
-                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">{formError}</div>
+                  <div className="p-3 bg-[#2A1418] border border-[#4A2A30] text-[#F87171] rounded-xl text-xs flex items-center gap-2">
+                    <i className="ph ph-warning-circle text-base shrink-0"></i>
+                    <span>{formError}</span>
+                  </div>
                 )}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Nama Kategori</label>
+                  <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Nama Kategori</label>
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Makanan, Gaji, Transportasi"
+                    placeholder="Contoh: Makanan, Belanja, Gaji Pokok"
                     value={catName}
                     onChange={(e) => setCatName(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none"
+                    className="w-full px-4 py-2.5 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-[#F5F5F5] placeholder-[#6E6E74] focus:border-[#465FFF] focus:ring-1 focus:ring-[#465FFF] focus:outline-none transition-all text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Tipe</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Tipe Kategori</label>
+                  <div className="grid grid-cols-2 gap-2 bg-[#1A1A1D] p-1 rounded-xl border border-[#2A2A2E]">
                     {(["expense", "income"] as const).map((type) => (
                       <button
                         key={type}
                         type="button"
                         onClick={() => setCatType(type)}
-                        className={`py-2.5 rounded-xl text-sm font-bold transition-all ${
+                        className={`py-2 rounded-lg text-xs font-semibold transition-all ${
                           catType === type
                             ? type === "income"
-                              ? "bg-green-100 text-[#65A30D] border border-green-300"
-                              : "bg-orange-100 text-orange-600 border border-orange-300"
-                            : "bg-gray-100 text-gray-500 border border-transparent hover:bg-gray-200"
+                              ? "bg-[#A3E635] text-[#0C0C0E] shadow"
+                              : "bg-[#FB923C] text-[#0C0C0E] shadow"
+                            : "text-[#9E9EA4] hover:text-[#F5F5F5]"
                         }`}
                       >
                         {type === "income" ? "Pemasukan" : "Pengeluaran"}
@@ -229,18 +447,18 @@ export default function CategoriesPage() {
                     ))}
                   </div>
                 </div>
-                <div className="pt-4 flex gap-3">
+                <div className="pt-3 flex gap-3">
                   <button
                     type="button"
                     onClick={() => setModalOpen(false)}
-                    className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all"
+                    className="flex-1 py-2.5 bg-[#202023] hover:bg-[#2A2A2E] text-[#F5F5F5] border border-[#2A2A2E] font-semibold rounded-full text-xs transition-all"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="flex-1 py-2.5 bg-[#8CE533] hover:bg-[#7cd02a] text-gray-900 font-bold rounded-xl text-sm shadow-sm transition-all disabled:opacity-60"
+                    className="flex-1 py-2.5 bg-[#FFFFFF] text-[#0C0C0E] hover:scale-[1.02] active:scale-[0.98] font-semibold rounded-full text-xs shadow-md transition-all disabled:opacity-50"
                   >
                     {submitting ? "Menyimpan..." : "Simpan Kategori"}
                   </button>
@@ -252,42 +470,48 @@ export default function CategoriesPage() {
 
         {/* Modal Rename */}
         {renameCat && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-float w-full max-w-md overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-extrabold text-gray-900 text-lg font-display">Ganti Nama Kategori</h3>
-                <button onClick={() => setRenameCat(null)} className="text-gray-400 hover:text-gray-600 p-1">
-                  <i className="ph ph-x text-xl"></i>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <div className="bg-[#151516] rounded-[24px] border border-[#1F1F22] shadow-2xl w-full max-w-md overflow-hidden animate-fade-in">
+              <div className="px-6 py-4 border-b border-[#1F1F22] flex items-center justify-between">
+                <h3 className="font-bold text-[#F5F5F5] text-base font-display">Ganti Nama Kategori</h3>
+                <button
+                  onClick={() => setRenameCat(null)}
+                  className="w-8 h-8 rounded-full bg-[#202023] hover:bg-[#2A2A2E] text-[#9E9EA4] hover:text-[#F5F5F5] flex items-center justify-center transition-colors"
+                >
+                  <i className="ph ph-x text-base"></i>
                 </button>
               </div>
               <form onSubmit={handleRename} className="p-6 space-y-4">
                 {renameError && (
-                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">{renameError}</div>
+                  <div className="p-3 bg-[#2A1418] border border-[#4A2A30] text-[#F87171] rounded-xl text-xs flex items-center gap-2">
+                    <i className="ph ph-warning-circle text-base shrink-0"></i>
+                    <span>{renameError}</span>
+                  </div>
                 )}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Nama Kategori</label>
+                  <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Nama Kategori</label>
                   <input
                     type="text"
                     required
                     value={renameName}
                     onChange={(e) => setRenameName(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none"
+                    className="w-full px-4 py-2.5 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-[#F5F5F5] placeholder-[#6E6E74] focus:border-[#465FFF] focus:ring-1 focus:ring-[#465FFF] focus:outline-none transition-all text-sm"
                   />
                 </div>
-                <div className="pt-4 flex gap-3">
+                <div className="pt-3 flex gap-3">
                   <button
                     type="button"
                     onClick={() => setRenameCat(null)}
-                    className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all"
+                    className="flex-1 py-2.5 bg-[#202023] hover:bg-[#2A2A2E] text-[#F5F5F5] border border-[#2A2A2E] font-semibold rounded-full text-xs transition-all"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={renameSubmitting}
-                    className="flex-1 py-2.5 bg-[#8CE533] hover:bg-[#7cd02a] text-gray-900 font-bold rounded-xl text-sm shadow-sm transition-all disabled:opacity-60"
+                    className="flex-1 py-2.5 bg-[#FFFFFF] text-[#0C0C0E] hover:scale-[1.02] active:scale-[0.98] font-semibold rounded-full text-xs shadow-md transition-all disabled:opacity-50"
                   >
-                    {renameSubmitting ? "Menyimpan..." : "Simpan"}
+                    {renameSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
                   </button>
                 </div>
               </form>
@@ -297,24 +521,29 @@ export default function CategoriesPage() {
 
         {/* Modal Merge */}
         {mergeSource && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-float w-full max-w-md overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-extrabold text-gray-900 text-lg font-display">Gabungkan Kategori</h3>
-                <button onClick={() => setMergeSource(null)} className="text-gray-400 hover:text-gray-600 p-1">
-                  <i className="ph ph-x text-xl"></i>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <div className="bg-[#151516] rounded-[24px] border border-[#1F1F22] shadow-2xl w-full max-w-md overflow-hidden animate-fade-in">
+              <div className="px-6 py-4 border-b border-[#1F1F22] flex items-center justify-between">
+                <h3 className="font-bold text-[#F5F5F5] text-base font-display">Gabungkan Kategori</h3>
+                <button
+                  onClick={() => setMergeSource(null)}
+                  className="w-8 h-8 rounded-full bg-[#202023] hover:bg-[#2A2A2E] text-[#9E9EA4] hover:text-[#F5F5F5] flex items-center justify-center transition-colors"
+                >
+                  <i className="ph ph-x text-base"></i>
                 </button>
               </div>
               <form onSubmit={handleMerge} className="p-6 space-y-4">
                 {mergeError && (
-                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">{mergeError}</div>
+                  <div className="p-3 bg-[#2A1418] border border-[#4A2A30] text-[#F87171] rounded-xl text-xs flex items-center gap-2">
+                    <i className="ph ph-warning-circle text-base shrink-0"></i>
+                    <span>{mergeError}</span>
+                  </div>
                 )}
-                <p className="text-sm text-gray-700">
-                  Gabungkan <b>{mergeSource.name}</b> ke kategori lain. Semua transaksinya akan dipindahkan,
-                  lalu kategori dihapus.
+                <p className="text-xs text-[#9E9EA4] leading-relaxed">
+                  Semua transaksi yang saat ini berada di kategori <b className="text-[#F5F5F5]">{mergeSource.name}</b> akan dipindahkan ke kategori tujuan, setelah itu kategori ini akan dihapus.
                 </p>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Kategori Tujuan</label>
+                  <label className="block text-xs font-semibold text-[#9E9EA4] uppercase tracking-wider mb-2">Kategori Tujuan</label>
                   <select
                     value={mergeTargetId}
                     onChange={(e) => {
@@ -323,9 +552,9 @@ export default function CategoriesPage() {
                       setMergeError(null);
                       if (e.target.value) openMerge(mergeSource, e.target.value);
                     }}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#8CE533] focus:outline-none text-sm"
+                    className="w-full px-3 py-2 bg-[#1A1A1D] border border-[#2A2A2E] rounded-xl text-xs font-medium text-[#F5F5F5] focus:border-[#465FFF] focus:outline-none transition-all"
                   >
-                    <option value="">Pilih Kategori</option>
+                    <option value="">Pilih Kategori Tujuan</option>
                     {categories
                       .filter((c) => c.id !== mergeSource.id && c.type === mergeSource.type)
                       .map((cat) => (
@@ -336,31 +565,31 @@ export default function CategoriesPage() {
                   </select>
                 </div>
                 {mergePreview && (
-                  <div className="p-3 bg-lime-50 border border-lime-200 text-sm text-gray-700 rounded-xl">
-                    <p className="font-bold text-[#65A30D]">
+                  <div className="p-3 bg-[#1A1B2E] border border-[#2A2E50] rounded-xl text-xs text-[#93C5FD]">
+                    <p className="font-semibold text-[#F5F5F5]">
                       {mergePreview.transactions_to_move} transaksi akan dipindahkan
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-[11px] text-[#9E9EA4] mt-0.5">
                       {mergePreview.earliest_date
-                        ? `Dimulai sejak ${new Date(mergePreview.earliest_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}`
-                        : "Belum ada transaksi"}
+                        ? `Mulai transaksi: ${new Date(mergePreview.earliest_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}`
+                        : "Belum ada transaksi terkait"}
                     </p>
                   </div>
                 )}
-                <div className="pt-4 flex gap-3">
+                <div className="pt-3 flex gap-3">
                   <button
                     type="button"
                     onClick={() => setMergeSource(null)}
-                    className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all"
+                    className="flex-1 py-2.5 bg-[#202023] hover:bg-[#2A2A2E] text-[#F5F5F5] border border-[#2A2A2E] font-semibold rounded-full text-xs transition-all"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={mergeSubmitting || !mergeTargetId}
-                    className="flex-1 py-2.5 bg-[#8CE533] hover:bg-[#7cd02a] text-gray-900 font-bold rounded-xl text-sm shadow-sm transition-all disabled:opacity-60"
+                    className="flex-1 py-2.5 bg-[#FFFFFF] text-[#0C0C0E] hover:scale-[1.02] active:scale-[0.98] font-semibold rounded-full text-xs shadow-md transition-all disabled:opacity-50"
                   >
-                    {mergeSubmitting ? "Menggabung..." : "Gabungkan & Hapus"}
+                    {mergeSubmitting ? "Menggabungkan..." : "Gabungkan & Hapus"}
                   </button>
                 </div>
               </form>
@@ -370,239 +599,47 @@ export default function CategoriesPage() {
 
         {/* Modal Delete */}
         {deleteConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-float w-full max-w-md overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-extrabold text-gray-900 text-lg font-display">Hapus Kategori</h3>
-                <button onClick={() => setDeleteConfirm(null)} className="text-gray-400 hover:text-gray-600 p-1">
-                  <i className="ph ph-x text-xl"></i>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <div className="bg-[#151516] rounded-[24px] border border-[#1F1F22] shadow-2xl w-full max-w-md overflow-hidden animate-fade-in">
+              <div className="px-6 py-4 border-b border-[#1F1F22] flex items-center justify-between">
+                <h3 className="font-bold text-[#F5F5F5] text-base font-display">Hapus Kategori</h3>
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="w-8 h-8 rounded-full bg-[#202023] hover:bg-[#2A2A2E] text-[#9E9EA4] hover:text-[#F5F5F5] flex items-center justify-center transition-colors"
+                >
+                  <i className="ph ph-x text-base"></i>
                 </button>
               </div>
               <form onSubmit={handleDelete} className="p-6 space-y-4">
                 {deleteError && (
-                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
-                    {deleteError}
-                    <p className="text-xs font-semibold mt-1.5">
-                      Solusi: coba tombol <b>&quot;Gabungkan&quot;</b> di kategori ini untuk memindahkan transaksinya
-                      ke kategori lain sebelum dihapus.
+                  <div className="p-3 bg-[#2A1418] border border-[#4A2A30] text-[#F87171] rounded-xl text-xs">
+                    <p className="font-semibold">{deleteError}</p>
+                    <p className="text-[11px] mt-1 text-[#FDA5A5]">
+                      Gunakan fitur &quot;Gabungkan&quot; terlebih dahulu untuk memindahkan transaksi sebelum kategori dihapus.
                     </p>
                   </div>
                 )}
-                <p className="text-sm text-gray-700">
-                  Hapus kategori <b>{deleteConfirm.name}</b>? Berlaku hanya bila tidak ada transaksi yang
-                  memakainya.
+                <p className="text-xs text-[#9E9EA4] leading-relaxed">
+                  Apakah Anda yakin ingin menghapus kategori <b className="text-[#F5F5F5]">{deleteConfirm.name}</b>? Kategori hanya dapat dihapus jika tidak ada transaksi yang terhubung.
                 </p>
-                <div className="pt-4 flex gap-3">
+                <div className="pt-3 flex gap-3">
                   <button
                     type="button"
                     onClick={() => setDeleteConfirm(null)}
-                    className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all"
+                    className="flex-1 py-2.5 bg-[#202023] hover:bg-[#2A2A2E] text-[#F5F5F5] border border-[#2A2A2E] font-semibold rounded-full text-xs transition-all"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={deleteSubmitting}
-                    className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-sm shadow-sm transition-all disabled:opacity-60"
+                    className="flex-1 py-2.5 bg-[#2A1418] text-[#F87171] border border-[#4A2A30] hover:bg-[#3A1C22] font-semibold rounded-full text-xs transition-all disabled:opacity-50"
                   >
                     {deleteSubmitting ? "Menghapus..." : "Hapus Kategori"}
                   </button>
                 </div>
               </form>
             </div>
-          </div>
-        )}
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-card">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-gray-500">
-                Total Kategori
-              </span>
-              <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg">
-                <i className="ph ph-tag"></i>
-              </div>
-            </div>
-            <p className="text-2xl font-extrabold text-gray-900 font-display">
-              {categories.length}
-            </p>
-          </div>
-          <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-card">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-gray-500">
-                Kategori Pemasukan
-              </span>
-              <div className="w-8 h-8 rounded-lg bg-green-100 text-[#65A30D] flex items-center justify-center text-lg">
-                <i className="ph ph-arrow-down-left"></i>
-              </div>
-            </div>
-            <p className="text-2xl font-extrabold text-gray-900 font-display">
-              {incomeCount}
-            </p>
-          </div>
-          <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-card">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-gray-500">
-                Kategori Pengeluaran
-              </span>
-              <div className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center text-lg">
-                <i className="ph ph-arrow-up-right"></i>
-              </div>
-            </div>
-            <p className="text-2xl font-extrabold text-gray-900 font-display">
-              {expenseCount}
-            </p>
-          </div>
-        </div>
-
-        {/* Peringatan transaksi tanpa kategori */}
-        {uncategorizedCount > 0 && (
-          <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center gap-3">
-            <i className="ph ph-warning-circle text-amber-600 text-xl"></i>
-            <div>
-              <p className="text-sm font-bold text-amber-900">
-                {uncategorizedCount} transaksi belum punya kategori
-              </p>
-              <p className="text-xs text-amber-700">
-                Transaksi pemasukan/pengeluaran wajib berkategori. Gabungkan atau tambahkan kategori lalu
-                perbarui transaksinya.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Filter */}
-        <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-card flex flex-wrap items-center gap-3">
-          <span className="text-sm font-semibold text-gray-600">Filter:</span>
-          <div className="flex gap-2">
-            {[
-              { key: "all", label: "Semua" },
-              { key: "income", label: "Pemasukan" },
-              { key: "expense", label: "Pengeluaran" },
-            ].map((item) => (
-              <button
-                key={item.key}
-                onClick={() => setFilter(item.key as any)}
-                className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-all ${
-                  filter === item.key
-                    ? "bg-[#8CE533] text-gray-900"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Error State */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 p-4 rounded-xl flex items-center gap-3">
-            <i className="ph ph-warning-circle text-red-600 text-xl"></i>
-            <div>
-              <p className="text-sm font-semibold text-red-900">
-                Gagal Memuat Data
-              </p>
-              <p className="text-xs text-red-700">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Loading State */}
-        {loading && (
-          <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-card text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#8CE533] border-t-transparent"></div>
-            <p className="text-sm text-gray-600 mt-3">Memuat kategori...</p>
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!loading && !error && filteredCategories.length === 0 && (
-          <div className="bg-white p-12 rounded-2xl border border-gray-200 shadow-card text-center">
-            <div className="w-16 h-16 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center text-3xl mx-auto mb-4">
-              <i className="ph ph-tag"></i>
-            </div>
-            <h3 className="text-base font-bold text-gray-900 mb-1">
-              Belum Ada Kategori
-            </h3>
-            <p className="text-sm text-gray-600">
-              Buat kategori untuk mengklasifikasikan transaksi Anda.
-            </p>
-          </div>
-        )}
-
-        {/* Categories List */}
-        {!loading && !error && filteredCategories.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredCategories.map((category) => (
-              <div
-                key={category.id}
-                className="bg-white p-5 rounded-2xl border border-gray-200 shadow-card hover:shadow-float transition-all group"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div
-                    className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl ${
-                      category.type === "income"
-                        ? "bg-green-100 text-[#65A30D]"
-                        : "bg-orange-100 text-orange-600"
-                    }`}
-                  >
-                    <i className="ph ph-tag"></i>
-                  </div>
-                  {!category.is_system && (
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => setDeleteConfirm(category)}
-                        className="opacity-0 group-hover:opacity-100 p-2 text-gray-400 hover:text-red-600 transition-all"
-                        title="Hapus kategori"
-                      >
-                        <i className="ph ph-trash text-base"></i>
-                      </button>
-                      <button
-                        onClick={() => openRename(category)}
-                        className="opacity-0 group-hover:opacity-100 p-2 text-gray-400 hover:text-gray-600 transition-all"
-                        title="Ganti nama"
-                      >
-                        <i className="ph ph-pencil-simple text-base"></i>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setMergeSource(category);
-                          setMergeTargetId("");
-                        }}
-                        className="opacity-0 group-hover:opacity-100 p-2 text-gray-400 hover:text-[#65A30D] transition-all"
-                        title="Gabungkan kategori"
-                      >
-                        <i className="ph ph-shuffle text-base"></i>
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <h3 className="text-base font-bold text-gray-900 mb-1">
-                  {category.name}
-                </h3>
-                <div className="flex items-center gap-2 text-xs">
-                  <span
-                    className={`px-2 py-1 rounded-md font-semibold ${
-                      category.type === "income"
-                        ? "bg-green-100 text-[#65A30D]"
-                        : "bg-orange-100 text-orange-600"
-                    }`}
-                  >
-                    {category.type === "income" ? "Pemasukan" : "Pengeluaran"}
-                  </span>
-                  {category.is_system && (
-                    <span className="px-2 py-1 rounded-md font-semibold bg-gray-100 text-gray-600">
-                      Sistem
-                    </span>
-                  )}
-                  <span className="ml-auto text-xs font-semibold text-gray-500">
-                    {category.transaction_count ?? 0} transaksi
-                  </span>
-                </div>
-              </div>
-            ))}
           </div>
         )}
       </div>

@@ -360,7 +360,7 @@ export function AppShell({
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 max-w-[1440px] w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 max-w-[1440px] w-full mx-auto animate-fade-in">
           {children}
         </main>
       </div>

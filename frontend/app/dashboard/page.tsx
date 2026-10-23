@@ -71,6 +71,8 @@ export default function UserDashboard() {
   const [trend6m, setTrend6m] = useState<TrendPoint[]>([]); // baseline bulanan utk delta
   const [catStats, setCatStats] = useState<CategoryStat[]>([]);
   const [topExpenses, setTopExpenses] = useState<MonthlyReport["top_expenses"]>([]);
+  const [monthLabel, setMonthLabel] = useState("");
+  const [monthShortLabel, setMonthShortLabel] = useState("");
   // Filter tabel transaksi terbaru
   const [txFilter, setTxFilter] = useState<"all" | "income" | "expense">("all");
 
@@ -85,6 +87,8 @@ export default function UserDashboard() {
 
         // Get summary for this month
         const now = new Date();
+        setMonthLabel(now.toLocaleDateString("id-ID", { month: "long", year: "numeric" }));
+        setMonthShortLabel(now.toLocaleDateString("id-ID", { month: "short", year: "numeric" }));
         const from = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
         const to = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
         const thisMonth = from.slice(0, 7);
@@ -239,7 +243,7 @@ export default function UserDashboard() {
   }
 
   // ── Card styling (TailAdmin pattern) ──────────────────────────────
-  const cardFrame = "rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5";
+  const cardFrame = "rounded-2xl border border-[#1F1F22] bg-[#1A1A1D] p-1.5 hover-lift";
   const cardInner = "rounded-xl bg-[#151516] p-5 h-full";
 
   // ── KPI Data ──────────────────────────────────────────────────────
@@ -280,7 +284,7 @@ export default function UserDashboard() {
       icon: "ph-receipt",
       iconBg: "bg-[#1F1A33]",
       iconColor: "text-[#C4B5FD]",
-      delta: <span className="text-xs text-[#9E9EA4]">Bulan {new Date().toLocaleDateString("id-ID", { month: "short", year: "numeric" })}</span>,
+      delta: <span className="text-xs text-[#9E9EA4]">Bulan {monthShortLabel || "ini"}</span>,
     },
   ];
 
@@ -318,13 +322,18 @@ export default function UserDashboard() {
       <div className="space-y-5">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-bold text-[#F5F5F5] font-display tracking-tight">
-              Halo, {userName}! 👋
-            </h2>
-            <p className="text-sm text-[#9E9EA4] mt-1">
-              Ringkasan keuangan pribadi Anda bulan ini, dari satu sumber angka.
-            </p>
+          <div className="flex items-center gap-3 animate-fade-up">
+            <div className="w-10 h-10 rounded-xl bg-[#1F1F22] flex items-center justify-center icon-glow">
+              <i className="ph ph-house text-xl text-[#93C5FD]"></i>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-[#F5F5F5] font-display tracking-tight">
+                Halo, {userName}! 👋
+              </h2>
+              <p className="text-sm text-[#9E9EA4] mt-1">
+                Ringkasan keuangan pribadi Anda bulan ini, dari satu sumber angka.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -352,7 +361,7 @@ export default function UserDashboard() {
                 </div>
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1.5 text-xs font-medium text-white/70">
                   <i className="ph ph-calendar-blank"></i>
-                  {new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
+                  {monthLabel || "Bulan Ini"}
                 </span>
               </div>
 
@@ -592,7 +601,7 @@ export default function UserDashboard() {
                         {(() => {
                           let runningOffset = 0;
                           return catStats.map((cat, i) => {
-                            const pct = catTotal > 0 ? (cat.total / catTotal) * 100 : 0;
+                            const pct = cat.percent;
                             const dash = (pct / 100) * donutCircumference;
                             const offset = -runningOffset;
                             runningOffset += dash;
@@ -627,7 +636,7 @@ export default function UserDashboard() {
                     {/* Legend list */}
                     <div className="space-y-2.5">
                       {catStats.map((cat, i) => {
-                        const pct = catTotal > 0 ? ((cat.total / catTotal) * 100).toFixed(1) : "0";
+                        const pct = cat.percent.toFixed(1);
                         return (
                           <div key={cat.category_id || i} className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2 min-w-0">
